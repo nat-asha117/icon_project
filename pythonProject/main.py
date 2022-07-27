@@ -1,4 +1,5 @@
 # Ingegneria della conoscenza
+# Natasha Fabrizio - Francesco Saverio Cassano
 
 import sklearn
 import pandas as pd
@@ -28,7 +29,7 @@ from sklearn.svm import SVC
 df_smoke = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
 print()
 print()
-print("Benvenuto nel nostro sistema per predire se, presi dei soggetti, essi sono affetti o meno dal Cancro al Seno")
+print("Benvenuto nel nostro sistema per predire se, presi dei soggetti, essi sono fumatori o meno.\n")
 print()
 print()
 # print(df_smoke)
@@ -50,7 +51,8 @@ X = df_smoke.drop("smoking", axis=1)
 Y = df_smoke["smoking"]
 
 # BILANCIAMENTO DELLE CLASSI
-# Proporzione dei non malati di tiroide (0) e malati di tiroide (1): [Numero di (non) malati di tiroide/Numero totale di pazienti]
+# Proporzione dei non malati di tiroide (0) e malati di tiroide (1):
+# [Numero di (non) malati di tiroide/Numero totale di pazienti]
 print()
 print('non presenza fumo:', df_smoke.smoking.value_counts()[0],
       '(% {:.2f})'.format(df_smoke.smoking.value_counts()[0] / df_smoke.smoking.count() * 100))
@@ -72,7 +74,7 @@ plt.show()
 # EVALUATION SELECTION: K-FOLD CROSS VALIDATION
 
 # Creazione della feature X e del target y
-X = df_smoke.to_numpy()
+X = df_smoke.to_numpy()                                                         # Questo forse va eliminato qui o sopra
 y = df_smoke["smoking"].to_numpy()  # K-Fold Cross Validation
 
 kf = StratifiedKFold(n_splits=5)  # La classe è in squilibrio, quindi utilizzo Stratified K-Fold ???
@@ -229,7 +231,7 @@ print('\033[1m' + '\nArchi della rete:\n' + '\033[0m', bNet.edges)
 # Eliminazione delle variabili ininfluenti
 data = VariableElimination(bNet)
 
-# Soggetto potenzialmente non diabetico
+# Soggetto potenzialmente non fumatore
 notSmoker = data.query(variables=['smoking'],
                        evidence={'age': 55, 'height(cm)': 170, 'weight(kg)': 60, 'waist(cm)': 8,
                                  'hemoglobin': 158, 'dental caries': 0})
@@ -238,7 +240,7 @@ print('\nProbabilità per un soggetto potenzialmente non fumatore:')
 print(notSmoker, '\n')
 
 """
-# Soggetto potenzialmente diabetico
+# Soggetto potenzialmente fumatore
 smoker = data.query(variables=['smoking'],
                     evidence={'age': 40, 'height(cm)': 155, 'weight(kg)': 45, 'waist(cm)': 590, 'systolic': 950,
                               'relaxation': 520, 'fasting blood sugar': 810, 'Cholesterol': 1550,
