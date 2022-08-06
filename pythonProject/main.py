@@ -26,7 +26,7 @@ from pgmpy.inference import VariableElimination
 from sklearn import svm
 from sklearn.svm import SVC
 
-df_smoke = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
+df_smoke = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
 print()
 print()
 print("Benvenuto nel nostro sistema per predire se, presi dei soggetti, essi sono fumatori o meno.\n")
@@ -64,10 +64,19 @@ print('presenza fumo:', df_smoke.smoking.value_counts()[1],
 def autopct(pct):  # Mostra solo i valori delle laber che sono superiori al 10%
     return ('%.2f' % pct + "%") if pct > 10 else ''
 
+'''
+plt.plot(val, marker ="x")      # val è il dataset, marker = "simbolo", inserisce il carattere come pallino
+plt.xlabel("Testo")             # testo barra y
+plt.ylabel("Testo")             # testo barra x
+plt.title("Titolo")             # testo titolo
+plt.legend(["Val"])             # legenda grafico
+'''
 
 labels = ["Fumatori", "Non fumatori"]
 ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(4, 4), autopct=autopct, labels=None)
 ax.axes.get_yaxis().set_visible(False)
+plt.title("Grafico occorrenze di fumatori e non fumatori")
+plt.xlabel("Testo")
 plt.legend(labels=labels, loc="best")
 plt.show()
 
