@@ -26,7 +26,7 @@ from pgmpy.inference import VariableElimination
 from sklearn import svm
 from sklearn.svm import SVC
 
-df_smoke = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
+df_smoke = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
 print()
 print()
 print("Benvenuto nel nostro sistema per predire se, presi dei soggetti, essi sono fumatori o meno.\n")
@@ -35,13 +35,13 @@ print()
 # print(df_smoke)
 print()
 
-# conversione da stringa a intero + pulizia dataframe - POTREBBE NON SERVIRE!
-# df_smoke["gender"] = df_smoke["gender"].replace("M", 0)
-# df_smoke["gender"] = df_smoke["gender"].replace("F", 1)
+# conversione da stringa a intero + pulizia dataframe - POTREBBE NON SERVIRE! E INVECEEE!!!
+df_smoke["tartar"] = df_smoke["tartar"].replace("N", 0)
+df_smoke["tartar"] = df_smoke["tartar"].replace("Y", 1)
 
 df_smoke = df_smoke.drop(
     ["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "AST", "ALT", "Gtp",
-     "oral", "tartar"], axis=1)
+     "oral"], axis=1)
 # df_smoke["gender"] = df_smoke ["gender"].astype(int)
 
 print(df_smoke)
@@ -62,7 +62,7 @@ print('presenza fumo:', df_smoke.smoking.value_counts()[1],
 
 # Visualizzazione del grafico
 def autopct(pct):  # Mostra solo i valori delle laber che sono superiori al 10%
-    return ('%.2f' % pct + "%") if pct > 10 else ''
+    return ('%.2f' % pct + "%") if pct > 1 else ''
 
 '''
 plt.plot(val, marker ="x")      # val è il dataset, marker = "simbolo", inserisce il carattere come pallino
@@ -72,11 +72,10 @@ plt.title("Titolo")             # testo titolo
 plt.legend(["Val"])             # legenda grafico
 '''
 
-labels = ["Fumatori", "Non fumatori"]
-ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(4, 4), autopct=autopct, labels=None)
+labels = ["Not smokers", "Smokers"]
+ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(5, 5), autopct=autopct, labels=None)
 ax.axes.get_yaxis().set_visible(False)
-plt.title("Grafico occorrenze di fumatori e non fumatori")
-plt.xlabel("Testo")
+plt.title("Graph of occurrence of smokers and non-smokers")
 plt.legend(labels=labels, loc="best")
 plt.show()
 
@@ -200,16 +199,16 @@ rfc = RandomForestClassifier(random_state=42, n_estimators=100)
 rfc_model = rfc.fit(X, y)
 
 # Tracciamento delle feature in base alla loro importanza
-plt.style.use('ggplot')
-(pd.Series(rfc_model.feature_importances_, index=X.columns)
+ax = (pd.Series(rfc_model.feature_importances_, index=X.columns)
  .nlargest(10)  # Numero massimo di feature da visualizzare
- .plot(kind='barh', figsize=[10, 5])  # Tipo di grafico e dimensione
+ .plot(kind='pie', figsize=(6, 6), autopct=autopct)  # Tipo di grafico e dimensione
  .invert_yaxis())  # Assicuro un ordine decrescente
 
 # Visualizzazione del grafico
-plt.title('Top features derived by Random Forest', size=20)
-plt.yticks(size=15)
+plt.title("Top features derived by Random Forest")
+plt.ylabel("")
 plt.show()
+
 
 # CREAZIONE DELLA RETE BAYESIANA
 # Conversione di tutti i valori all'interno del dataframe in interi
@@ -242,8 +241,8 @@ data = VariableElimination(bNet)
 
 # Soggetto potenzialmente non fumatore
 notSmoker = data.query(variables=['smoking'],
-                       evidence={'age': 55, 'height(cm)': 170, 'weight(kg)': 60, 'waist(cm)': 8,
-                                 'hemoglobin': 158, 'dental caries': 0})
+                       evidence={'systolic': 1480, 'relaxation': 880, 'Cholesterol': 1680,
+                                 'triglyceride': 750, 'HDL': 870, 'LDL': 830, 'hemoglobin': 103, 'serum creatinine': 6, 'tartar': 0})
 
 print('\nProbabilità per un soggetto potenzialmente non fumatore:')
 print(notSmoker, '\n')
