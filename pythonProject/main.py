@@ -27,11 +27,25 @@ from pgmpy.inference import VariableElimination
 from sklearn import svm
 from sklearn.svm import SVC
 
-df = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
-
-
 def prPurple(prt):
     print("\033[95m{}\033[00m".format(prt))
+
+def prRed3(prt, prt2, prt3):
+    print("\033[91m{}\033[00m".format(prt), prt2, prt3)
+
+def prGreen3(prt, prt2, prt3):
+    print("\033[92m{}\033[00m".format(prt), prt2, prt3)
+
+def prRed(prt):
+    print("\033[91m{}\033[00m".format(prt))
+
+def prGreen(prt):
+    print("\033[92m{}\033[00m".format(prt))
+
+def prYellow(prt):
+    print("\033[93m{}\033[00m".format(prt))
+
+df = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
 
 
 prPurple("\n\n\t\t\tBenvenuto nel nostro sistema per predire se, presi dei soggetti, essi sono fumatori o meno.\n\n")
@@ -53,11 +67,11 @@ Y = df_smoke["smoking"]
 
 # Proporzione dei non fumatori (0) e fumatori (1):
 # [Numero di (non) fumatori/Numero totale fumartori]
-print()
-print('non presenza fumo:', df_smoke.smoking.value_counts()[0],
+
+prGreen3('Non presenza fumo:' ,df_smoke.smoking.value_counts()[0],
       '(% {:.2f})'.format(df_smoke.smoking.value_counts()[0] / df_smoke.smoking.count() * 100))
-print('presenza fumo:', df_smoke.smoking.value_counts()[1],
-      '(% {:.2f})'.format(df_smoke.smoking.value_counts()[1] / df_smoke.smoking.count() * 100), '\n')
+prRed3('Presenza fumo:', df_smoke.smoking.value_counts()[1],
+      '(% {:.2f})'.format(df_smoke.smoking.value_counts()[1] / df_smoke.smoking.count() * 100))
 
 
 # Visualizzazione del grafico
@@ -254,7 +268,7 @@ print('\033[1m' + '\nArchi della rete:\n' + '\033[0m', bNet.edges)
 
 # CALCOLO DELLA PROBABILITÀ
 
-# Calcolo della probabilità per un soggetto presumibilmente non diabetico (0) ed uno diabetico (1) di avere il diabete
+# Calcolo della probabilità per un soggetto presumibilmente non fumatore (0) ed uno fumatore (1)
 
 # Eliminazione delle variabili ininfluenti
 data = VariableElimination(bNet)
@@ -264,7 +278,7 @@ notSmoker = data.query(variables=['smoking'],
                        evidence={'systolic': 102, 'relaxation': 71, 'HDL': 103, 'hemoglobin': 11,
                                  'serum creatinine': 2, 'tartar': 0})
 
-print('\nProbabilità per un soggetto potenzialmente non fumatore:')
+prGreen('\nProbabilità per un soggetto potenzialmente non fumatore:')
 print(notSmoker, '\n')
 
 # Test su Soggetto potenzialmente non fumatore
@@ -272,7 +286,7 @@ TestnotSmoker = data.query(variables=['smoking'],
                            evidence={'systolic': 81, 'relaxation': 71, 'HDL': 103, 'hemoglobin': 16,
                                      'serum creatinine': 2, 'tartar': 1})
 
-print('\nTest su un soggetto potenzialmente non fumatore:')
+prGreen('\nTest su un soggetto potenzialmente non fumatore:')
 print(TestnotSmoker, '\n')
 
 # Soggetto potenzialmente fumatore
@@ -280,7 +294,7 @@ smoker = data.query(variables=['smoking'],
                     evidence={'systolic': 59, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 16,
                               'serum creatinine': 5, 'tartar': 1})
 
-print('\nProbabilità per un soggetto potenzialmente fumatore:')
+prRed('\nProbabilità per un soggetto potenzialmente fumatore:')
 print(smoker)
 
 # Test su Soggetto potenzialmente fumatore
@@ -288,5 +302,5 @@ TestnotSmoker = data.query(variables=['smoking'],
                            evidence={'systolic': 73, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 14,
                                      'serum creatinine': 5, 'tartar': 0})
 
-print('\nTest su un soggetto potenzialmente fumatore:')
+prRed('\nTest su un soggetto potenzialmente fumatore:')
 print(TestnotSmoker, '\n')
