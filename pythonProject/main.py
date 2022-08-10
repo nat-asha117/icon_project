@@ -17,6 +17,7 @@ from sklearn import preprocessing
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.naive_bayes import GaussianNB, BernoulliNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -26,24 +27,22 @@ from pgmpy.inference import VariableElimination
 from sklearn import svm
 from sklearn.svm import SVC
 
-df_smoke = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
-print()
-print()
-print("Benvenuto nel nostro sistema per predire se, presi dei soggetti, essi sono fumatori o meno.\n")
-print()
-print()
-# print(df_smoke)
-print()
+df = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
 
-# conversione da stringa a intero + pulizia dataframe - POTREBBE NON SERVIRE! E INVECEEE!!!
+
+def prPurple(prt):
+    print("\033[95m{}\033[00m".format(prt))
+
+
+prPurple("\n\n\t\t\tBenvenuto nel nostro sistema per predire se, presi dei soggetti, essi sono fumatori o meno.\n\n")
+
+df_smoke = df.drop(["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "oral"], axis=1)
+
+# conversione da stringa a intero + pulizia dataframe
 df_smoke["tartar"] = df_smoke["tartar"].replace("N", 0)
 df_smoke["tartar"] = df_smoke["tartar"].replace("Y", 1)
 
-df_smoke = df_smoke.drop(
-    ["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "AST", "ALT", "Gtp",
-     "oral"], axis=1)
-# df_smoke["gender"] = df_smoke ["gender"].astype(int)
-
+# stampa dataframe
 print(df_smoke)
 
 # dataset di input eliminando l'ultima colonna in quanto servirà per l'output
@@ -51,8 +50,9 @@ X = df_smoke.drop("smoking", axis=1)
 Y = df_smoke["smoking"]
 
 # BILANCIAMENTO DELLE CLASSI
-# Proporzione dei non malati di tiroide (0) e malati di tiroide (1):
-# [Numero di (non) malati di tiroide/Numero totale di pazienti]
+
+# Proporzione dei non fumatori (0) e fumatori (1):
+# [Numero di (non) fumatori/Numero totale fumartori]
 print()
 print('non presenza fumo:', df_smoke.smoking.value_counts()[0],
       '(% {:.2f})'.format(df_smoke.smoking.value_counts()[0] / df_smoke.smoking.count() * 100))
@@ -61,16 +61,9 @@ print('presenza fumo:', df_smoke.smoking.value_counts()[1],
 
 
 # Visualizzazione del grafico
-def autopct(pct):  # Mostra solo i valori delle laber che sono superiori al 10%
-    return ('%.2f' % pct + "%") if pct > 1 else ''
+def autopct(pct):
+    return ('%.2f' % pct + "%") if pct > 1 else ''  # mostra solo i valori delle laber che sono superiori al 1%
 
-'''
-plt.plot(val, marker ="x")      # val è il dataset, marker = "simbolo", inserisce il carattere come pallino
-plt.xlabel("Testo")             # testo barra y
-plt.ylabel("Testo")             # testo barra x
-plt.title("Titolo")             # testo titolo
-plt.legend(["Val"])             # legenda grafico
-'''
 
 labels = ["Not smokers", "Smokers"]
 ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(5, 5), autopct=autopct, labels=None)
@@ -82,7 +75,7 @@ plt.show()
 # EVALUATION SELECTION: K-FOLD CROSS VALIDATION
 
 # Creazione della feature X e del target y
-X = df_smoke.to_numpy()                                                         # Questo forse va eliminato qui o sopra
+X = df_smoke.to_numpy()
 y = df_smoke["smoking"].to_numpy()  # K-Fold Cross Validation
 
 kf = StratifiedKFold(n_splits=5)  # La classe è in squilibrio, quindi utilizzo Stratified K-Fold ???
@@ -92,6 +85,8 @@ knn = KNeighborsClassifier()
 dtc = DecisionTreeClassifier()
 rfc = RandomForestClassifier()
 svc = SVC()
+bnb = BernoulliNB()
+gnb = GaussianNB()
 
 # Score delle metriche
 model = {
@@ -117,7 +112,20 @@ model = {
             'precision_list': 0.0,
             'recall_list': 0.0,
             'f1_list': 0.0
-            }
+            },
+
+    'BernoulliNB': {'accuracy_list': 0.0,
+                   'precision_list': 0.0,
+                   'recall_list': 0.0,
+                   'f1_list': 0.0
+                    },
+
+    'GaussianNB': {'accuracy_list': 0.0,
+                   'precision_list': 0.0,
+                   'recall_list': 0.0,
+                   'f1_list': 0.0
+                   }
+
 }
 
 # K-Fold dei classificatori
@@ -139,11 +147,15 @@ for train_index, test_index in kf.split(X, y):
     dtc.fit(X_train, y_train)
     rfc.fit(X_train, y_train)
     svc.fit(X_train, y_train)
+    bnb.fit(X_train,y_train)
+    gnb.fit(X_train, y_train)
 
     y_pred_knn = knn.predict(X_test)
     y_pred_dtc = dtc.predict(X_test)
     y_pred_rfc = rfc.predict(X_test)
     y_pred_SVM = svc.predict(X_test)
+    y_pred_gnb = gnb.predict(X_test)
+    y_pred_bnb = bnb.predict(X_test)
 
     # Salvo le metriche del fold nel dizionario
     model['KNN']['accuracy_list'] = (metrics.accuracy_score(y_test, y_pred_knn))
@@ -166,6 +178,15 @@ for train_index, test_index in kf.split(X, y):
     model['SVM']['recall_list'] = (metrics.recall_score(y_test, y_pred_SVM))
     model['SVM']['f1_list'] = (metrics.f1_score(y_test, y_pred_SVM))
 
+    model['BernoulliNB']['accuracy_list'] = (metrics.accuracy_score(y_test, y_pred_bnb))
+    model['BernoulliNB']['precision_list'] = (metrics.precision_score(y_test, y_pred_bnb))
+    model['BernoulliNB']['recall_list'] = (metrics.recall_score(y_test, y_pred_bnb))
+    model['BernoulliNB']['f1_list'] = (metrics.f1_score(y_test, y_pred_bnb))
+
+    model['GaussianNB']['accuracy_list'] = (metrics.accuracy_score(y_test, y_pred_gnb))
+    model['GaussianNB']['precision_list'] = (metrics.precision_score(y_test, y_pred_gnb))
+    model['GaussianNB']['recall_list'] = (metrics.recall_score(y_test, y_pred_gnb))
+    model['GaussianNB']['f1_list'] = (metrics.f1_score(y_test, y_pred_gnb))
 
 # Modello di rapporto
 def model_report(model):
@@ -200,15 +221,14 @@ rfc_model = rfc.fit(X, y)
 
 # Tracciamento delle feature in base alla loro importanza
 ax = (pd.Series(rfc_model.feature_importances_, index=X.columns)
- .nlargest(10)  # Numero massimo di feature da visualizzare
- .plot(kind='pie', figsize=(6, 6), autopct=autopct)  # Tipo di grafico e dimensione
- .invert_yaxis())  # Assicuro un ordine decrescente
+      .nlargest(10)  # Numero massimo di feature da visualizzare
+      .plot(kind='pie', figsize=(6, 6), autopct=autopct)  # Tipo di grafico e dimensione
+      .invert_yaxis())  # Assicuro un ordine decrescente
 
 # Visualizzazione del grafico
 plt.title("Top features derived by Random Forest")
 plt.ylabel("")
 plt.show()
-
 
 # CREAZIONE DELLA RETE BAYESIANA
 # Conversione di tutti i valori all'interno del dataframe in interi
@@ -241,19 +261,32 @@ data = VariableElimination(bNet)
 
 # Soggetto potenzialmente non fumatore
 notSmoker = data.query(variables=['smoking'],
-                       evidence={'systolic': 1480, 'relaxation': 880, 'Cholesterol': 1680,
-                                 'triglyceride': 750, 'HDL': 870, 'LDL': 830, 'hemoglobin': 103, 'serum creatinine': 6, 'tartar': 0})
+                       evidence={'systolic': 102, 'relaxation': 71, 'HDL': 103, 'hemoglobin': 11,
+                                 'serum creatinine': 2, 'tartar': 0})
 
 print('\nProbabilità per un soggetto potenzialmente non fumatore:')
 print(notSmoker, '\n')
 
-"""
+# Test su Soggetto potenzialmente non fumatore
+TestnotSmoker = data.query(variables=['smoking'],
+                           evidence={'systolic': 81, 'relaxation': 71, 'HDL': 103, 'hemoglobin': 16,
+                                     'serum creatinine': 2, 'tartar': 1})
+
+print('\nTest su un soggetto potenzialmente non fumatore:')
+print(TestnotSmoker, '\n')
+
 # Soggetto potenzialmente fumatore
 smoker = data.query(variables=['smoking'],
-                    evidence={'age': 40, 'height(cm)': 155, 'weight(kg)': 45, 'waist(cm)': 590, 'systolic': 950,
-                              'relaxation': 520, 'fasting blood sugar': 810, 'Cholesterol': 1550,
-                              'triglyceride': 470, 'HDL': 880, 'LDL': 570, 'hemoglobin': 126, 'dental caries': 0})
+                    evidence={'systolic': 59, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 16,
+                              'serum creatinine': 5, 'tartar': 1})
 
 print('\nProbabilità per un soggetto potenzialmente fumatore:')
 print(smoker)
-"""
+
+# Test su Soggetto potenzialmente fumatore
+TestnotSmoker = data.query(variables=['smoking'],
+                           evidence={'systolic': 73, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 14,
+                                     'serum creatinine': 5, 'tartar': 0})
+
+print('\nTest su un soggetto potenzialmente fumatore:')
+print(TestnotSmoker, '\n')
