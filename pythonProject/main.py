@@ -1,56 +1,58 @@
 # Ingegneria della conoscenza
 # Natasha Fabrizio - Francesco Saverio Cassano
 
-import sklearn
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-import pgmpy
-
-from numpy import mean
-from numpy import std
-from sklearn import model_selection
+import numpy as np
+import pandas as pd
+from pgmpy.estimators import K2Score, HillClimbSearch, MaximumLikelihoodEstimator
+from pgmpy.inference import VariableElimination
+from pgmpy.models import BayesianNetwork
 from sklearn import metrics
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn import preprocessing
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.naive_bayes import GaussianNB, BernoulliNB
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from pgmpy.estimators import K2Score, HillClimbSearch, MaximumLikelihoodEstimator
-from pgmpy.models import BayesianNetwork
-from pgmpy.inference import VariableElimination
-from sklearn import svm
 from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
 
+
+# Support methods
 def prPurple(prt):
     print("\033[95m{}\033[00m".format(prt))
 
-def prRed3(prt, prt2, prt3):
+
+def prRedMoreString(prt, prt2, prt3):
     print("\033[91m{}\033[00m".format(prt), prt2, prt3)
 
-def prGreen3(prt, prt2, prt3):
-    print("\033[92m{}\033[00m".format(prt), prt2, prt3)
+
+def prGreenMoreString(prt, prt2, prt3):
+    print("\n\033[92m{}\033[00m".format(prt), prt2, prt3)
+
 
 def prRed(prt):
     print("\033[91m{}\033[00m".format(prt))
 
+
 def prGreen(prt):
     print("\033[92m{}\033[00m".format(prt))
+
 
 def prYellow(prt):
     print("\033[93m{}\033[00m".format(prt))
 
-df = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
 
+def autopct(pct):
+    return ('%.2f' % pct + "%") if pct > 1 else ''  # mostra solo i valori delle laber che sono superiori al 1%
+
+
+df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
 
 prPurple("\n\n\t\t\tBenvenuto nel nostro sistema per predire se, presi dei soggetti, essi sono fumatori o meno.\n\n")
 
-df_smoke = df.drop(["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "oral"], axis=1)
+# DATASET OPTIMIZATION
+# Deleting unused and/or irrelevant columns
+df_smoke = df.drop(["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "oral"],
+                   axis=1)
 
 # conversione da stringa a intero + pulizia dataframe
 df_smoke["tartar"] = df_smoke["tartar"].replace("N", 0)
@@ -58,6 +60,8 @@ df_smoke["tartar"] = df_smoke["tartar"].replace("Y", 1)
 
 # stampa dataframe
 print(df_smoke)
+
+
 
 # dataset di input eliminando l'ultima colonna in quanto servirà per l'output
 X = df_smoke.drop("smoking", axis=1)
@@ -68,16 +72,12 @@ Y = df_smoke["smoking"]
 # Proporzione dei non fumatori (0) e fumatori (1):
 # [Numero di (non) fumatori/Numero totale fumartori]
 
-prGreen3('Non presenza fumo:' ,df_smoke.smoking.value_counts()[0],
-      '(% {:.2f})'.format(df_smoke.smoking.value_counts()[0] / df_smoke.smoking.count() * 100))
-prRed3('Presenza fumo:', df_smoke.smoking.value_counts()[1],
-      '(% {:.2f})'.format(df_smoke.smoking.value_counts()[1] / df_smoke.smoking.count() * 100))
-
+prGreenMoreString('Non presenza fumo:', df_smoke.smoking.value_counts()[0],
+                  '(% {:.2f})'.format(df_smoke.smoking.value_counts()[0] / df_smoke.smoking.count() * 100))
+prRedMoreString('Presenza fumo:', df_smoke.smoking.value_counts()[1],
+                '(% {:.2f})'.format(df_smoke.smoking.value_counts()[1] / df_smoke.smoking.count() * 100))
 
 # Visualizzazione del grafico
-def autopct(pct):
-    return ('%.2f' % pct + "%") if pct > 1 else ''  # mostra solo i valori delle laber che sono superiori al 1%
-
 
 labels = ["Not smokers", "Smokers"]
 ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(5, 5), autopct=autopct, labels=None)
@@ -129,9 +129,9 @@ model = {
             },
 
     'BernoulliNB': {'accuracy_list': 0.0,
-                   'precision_list': 0.0,
-                   'recall_list': 0.0,
-                   'f1_list': 0.0
+                    'precision_list': 0.0,
+                    'recall_list': 0.0,
+                    'f1_list': 0.0
                     },
 
     'GaussianNB': {'accuracy_list': 0.0,
@@ -161,7 +161,7 @@ for train_index, test_index in kf.split(X, y):
     dtc.fit(X_train, y_train)
     rfc.fit(X_train, y_train)
     svc.fit(X_train, y_train)
-    bnb.fit(X_train,y_train)
+    bnb.fit(X_train, y_train)
     gnb.fit(X_train, y_train)
 
     y_pred_knn = knn.predict(X_test)
@@ -201,6 +201,7 @@ for train_index, test_index in kf.split(X, y):
     model['GaussianNB']['precision_list'] = (metrics.precision_score(y_test, y_pred_gnb))
     model['GaussianNB']['recall_list'] = (metrics.recall_score(y_test, y_pred_gnb))
     model['GaussianNB']['f1_list'] = (metrics.f1_score(y_test, y_pred_gnb))
+
 
 # Modello di rapporto
 def model_report(model):
