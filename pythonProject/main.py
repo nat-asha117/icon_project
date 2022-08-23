@@ -45,18 +45,19 @@ def autopct(pct):
     return ('%.2f' % pct + "%") if pct > 1 else ''  # mostra solo i valori delle laber che sono superiori al 1%
 
 
-df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
+df = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
 
 prPurple("\n\n\t\t\tBenvenuto nel nostro sistema per predire se, presi dei soggetti, essi sono fumatori o meno.\n\n")
 
 # DATASET OPTIMIZATION
 # Deleting unused and/or irrelevant columns
-df_smoke = df.drop(["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "oral"],
-                   axis=1)
+df_smoke = df.drop(["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "oral"], axis=1)
 
 # conversione da stringa a intero + pulizia dataframe
 df_smoke["tartar"] = df_smoke["tartar"].replace("N", 0)
 df_smoke["tartar"] = df_smoke["tartar"].replace("Y", 1)
+
+#df_smoke["height(cm)"] = df_smoke["height(cm)"].astype(float)
 
 # stampa dataframe
 print(df_smoke)
@@ -292,16 +293,16 @@ print(TestnotSmoker, '\n')
 
 # Soggetto potenzialmente fumatore
 smoker = data.query(variables=['smoking'],
-                    evidence={'systolic': 59, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 16,
+                    evidence={'systolic': 93, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 18,
                               'serum creatinine': 5, 'tartar': 1})
 
 prRed('\nProbabilità per un soggetto potenzialmente fumatore:')
 print(smoker)
 
 # Test su Soggetto potenzialmente fumatore
-TestnotSmoker = data.query(variables=['smoking'],
-                           evidence={'systolic': 73, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 14,
-                                     'serum creatinine': 5, 'tartar': 0})
+TestSmoker = data.query(variables=['smoking'],
+                        evidence={'systolic': 75, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 14,
+                                  'serum creatinine': 5, 'tartar': 0})
 
 prRed('\nTest su un soggetto potenzialmente fumatore:')
-print(TestnotSmoker, '\n')
+print(TestSmoker, '\n')
