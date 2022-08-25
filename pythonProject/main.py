@@ -267,10 +267,6 @@ k2_model = hc_k2.estimate(scoring_method=k2)
 bNet = BayesianNetwork(k2_model.edges())
 bNet.fit(df_smoke, estimator=MaximumLikelihoodEstimator)
 
-# Visualization of network nodes and arcs  - DA TOGLIERE!????
-print('\033[1m' + '\nNodes in the network:\n' + '\033[0m', bNet.nodes)
-print('\033[1m' + '\nArches of the net:\n' + '\033[0m', bNet.edges)
-
 
 # CALCULATION OF THE PROBABILITY
 # Probability calculation for a supposedly non-smoker (0) and a smoker (1)
