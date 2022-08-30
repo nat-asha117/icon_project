@@ -21,6 +21,7 @@ from sklearn.naive_bayes import GaussianNB, BernoulliNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.utils import resample
 
 
 # Support methods
@@ -47,7 +48,7 @@ def autopct(pct):
 
 
 # Import of the dataset
-df = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
+df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
 
 prYellow("\n\n\t\t\t\t\t\t\t\tWelcome to our system!\n\n\t"
          "It allows you to predict whether, taken of the subjects, they are smokers or not.\n\n")
@@ -62,14 +63,24 @@ df_smoke["tartar"] = df_smoke["tartar"].replace("N", 0)
 df_smoke["tartar"] = df_smoke["tartar"].replace("Y", 1)
 
 # Data overview
-print("\ndisplay (partial) of the dataframe", df_smoke)
+print("\ndisplay (partial) of the dataframe\n", df_smoke)
 
 # Input dataset, eliminating the last column (needed for the output)
 X = df_smoke.drop("smoking", axis=1)
 Y = df_smoke["smoking"]
 
 
+# print(df_smoke.loc[(df_smoke["smoking"] == 1), "systolic"].mean()) per calcolo della media
+
 # BALANCING OF CLASSES
+
+# Visualization of the aspect ratio chart
+labels = ["Not smokers", "Smokers"]
+ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(6, 6), autopct=autopct, labels=None)
+ax.axes.get_yaxis().set_visible(False)
+plt.title("Graph of occurrence of smokers and non-smokers")
+plt.legend(labels=labels, loc="best")
+plt.show()
 
 # Proportion of non-smokers (0) and smokers (1):
 # [Number of non-smokers/Total number of smokers]
@@ -78,11 +89,23 @@ prGreenMoreString('Smoke-free:', df_smoke.smoking.value_counts()[0],
 prRedMoreString('Presence of smoke:', df_smoke.smoking.value_counts()[1],
                 '(% {:.2f})'.format(df_smoke.smoking.value_counts()[1] / df_smoke.smoking.count() * 100))
 
+df_majority = df_smoke[df_smoke["smoking"]==0]
+df_minority = df_smoke[df_smoke["smoking"]==1]
+df_minority_upsampled = resample(df_minority, replace=True, n_samples=4473, random_state=42)
+df_smoke = pd.concat([df_minority_upsampled, df_majority])
+
+prYellow("\nValue after Oversampling:")
+prGreenMoreString('Smoke-free:', df_smoke.smoking.value_counts()[0],
+                  '(% {:.2f})'.format(df_smoke.smoking.value_counts()[0] / df_smoke.smoking.count() * 100))
+prRedMoreString('Presence of smoke:', df_smoke.smoking.value_counts()[1],
+                '(% {:.2f})'.format(df_smoke.smoking.value_counts()[1] / df_smoke.smoking.count() * 100))
+
+
 # Visualization of the aspect ratio chart
 labels = ["Not smokers", "Smokers"]
-ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(5, 5), autopct=autopct, labels=None)
+ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(6, 6), autopct=autopct, labels=None)
 ax.axes.get_yaxis().set_visible(False)
-plt.title("Graph of occurrence of smokers and non-smokers")
+plt.title("Graph of occurrence of smokers and non-smokers after Oversampling")
 plt.legend(labels=labels, loc="best")
 plt.show()
 
@@ -274,6 +297,9 @@ bNet.fit(df_smoke, estimator=MaximumLikelihoodEstimator)
 # Elimination of irrelevant variables
 data = VariableElimination(bNet)
 
+# Visualization of network nodes and arcs  - DA TOGLIERE!????
+print('\033[1m' + '\nNodes in the network:\n' + '\033[0m', bNet.nodes)
+print('\033[1m' + '\nArches of the net:\n' + '\033[0m', bNet.edges)
 # Potential non-smoker subject
 notSmoker = data.query(variables=['smoking'],
                        evidence={'systolic': 102, 'relaxation': 71, 'HDL': 103, 'hemoglobin': 11,
