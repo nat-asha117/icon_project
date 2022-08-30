@@ -48,7 +48,7 @@ def autopct(pct):
 
 
 # Import of the dataset
-df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
+df = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
 
 prYellow("\n\n\t\t\t\t\t\t\t\tWelcome to our system!\n\n\t"
          "It allows you to predict whether, taken of the subjects, they are smokers or not.\n\n")
@@ -70,12 +70,11 @@ X = df_smoke.drop("smoking", axis=1)
 Y = df_smoke["smoking"]
 
 
-
 # BALANCING OF CLASSES
 
 # Visualization of the aspect ratio chart
 labels = ["Not smokers", "Smokers"]
-ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(6, 6), autopct=autopct, labels=None)
+ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(5, 5), autopct=autopct, labels=None)
 ax.axes.get_yaxis().set_visible(False)
 plt.title("Graph of occurrence of smokers and non-smokers")
 plt.legend(labels=labels, loc="best")
@@ -102,9 +101,9 @@ prRedMoreString('Presence of smoke:', df_smoke.smoking.value_counts()[1],
 
 # Visualization of the aspect ratio chart
 labels = ["Not smokers", "Smokers"]
-ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(6, 6), autopct=autopct, labels=None)
+ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(5, 5), autopct=autopct, labels=None)
 ax.axes.get_yaxis().set_visible(False)
-plt.title("Graph of occurrence of smokers and non-smokers after Oversampling")
+plt.title("Graph of occurrence of smokers and non-smokers\n\nafter Oversampling")
 plt.legend(labels=labels, loc="best")
 plt.show()
 
@@ -298,32 +297,32 @@ data = VariableElimination(bNet)
 
 # Potential non-smoker subject
 notSmoker = data.query(variables=['smoking'],
-                       evidence={'Gtp': 22, 'triglyceride': 173, 'LDL': 125, 'systolic': 102,  'relaxation': 71, 'HDL': 103, 'hemoglobin': 13,
-                                 'serum creatinine': 2, 'tartar': 0})
+                       evidence={'Gtp': 31, 'triglyceride': 113, 'LDL': 116, 'systolic': 102,  'relaxation': 71,
+                                 'HDL': 103, 'hemoglobin': 13, 'serum creatinine': 2, 'tartar': 0})
 
 prGreen('\nProbability for a potentially non-smoker:')
 print(notSmoker, '\n')
 
 # Test on Potentially non-smoker subject
 TestnotSmoker = data.query(variables=['smoking'],
-                           evidence={'Gtp': 55, 'triglyceride': 112, 'LDL': 113,'systolic': 81, 'relaxation': 71, 'HDL': 103, 'hemoglobin': 16,
-                                     'serum creatinine': 2, 'tartar': 1})
+                           evidence={'Gtp': 53, 'triglyceride': 148, 'LDL': 116, 'systolic': 102, 'relaxation': 71,
+                                     'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'tartar': 1})
 
 prGreen('\nTest on Potentially non-smoker subject:')
 print(TestnotSmoker, '\n')
 
 # Potential smoker
 smoker = data.query(variables=['smoking'],
-                    evidence={'Gtp': 55, 'triglyceride': 150, 'LDL': 113,'systolic': 93, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 18,
-                              'serum creatinine': 5, 'tartar': 1})
+                    evidence={'Gtp': 55, 'triglyceride': 151, 'LDL': 113, 'systolic': 93, 'relaxation': 43, 'HDL': 50,
+                              'hemoglobin': 18, 'serum creatinine': 5, 'tartar': 1})
 
 prRed('\nProbability for a potential smoker:')
 print(smoker)
 
 # Test on subject potentially smoker
 TestSmoker = data.query(variables=['smoking'],
-                        evidence={'Gtp': 30, 'triglyceride': 112, 'LDL': 116 ,'systolic': 75, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 14,
-                                  'serum creatinine': 5, 'tartar': 0})
+                        evidence={'Gtp': 32, 'triglyceride': 111, 'LDL': 113, 'systolic': 93, 'relaxation': 43,
+                                  'HDL': 50, 'hemoglobin': 13, 'serum creatinine': 5, 'tartar': 0})
 
 prRed('\nTest on Subject potentially smoker:')
 print(TestSmoker, '\n')
