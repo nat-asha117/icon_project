@@ -70,7 +70,6 @@ X = df_smoke.drop("smoking", axis=1)
 Y = df_smoke["smoking"]
 
 
-# print(df_smoke.loc[(df_smoke["smoking"] == 1), "systolic"].mean()) per calcolo della media
 
 # BALANCING OF CLASSES
 
@@ -297,12 +296,9 @@ bNet.fit(df_smoke, estimator=MaximumLikelihoodEstimator)
 # Elimination of irrelevant variables
 data = VariableElimination(bNet)
 
-# Visualization of network nodes and arcs  - DA TOGLIERE!????
-print('\033[1m' + '\nNodes in the network:\n' + '\033[0m', bNet.nodes)
-print('\033[1m' + '\nArches of the net:\n' + '\033[0m', bNet.edges)
 # Potential non-smoker subject
 notSmoker = data.query(variables=['smoking'],
-                       evidence={'systolic': 102, 'relaxation': 71, 'HDL': 103, 'hemoglobin': 11,
+                       evidence={'Gtp': 22, 'triglyceride': 173, 'LDL': 125, 'systolic': 102,  'relaxation': 71, 'HDL': 103, 'hemoglobin': 13,
                                  'serum creatinine': 2, 'tartar': 0})
 
 prGreen('\nProbability for a potentially non-smoker:')
@@ -310,7 +306,7 @@ print(notSmoker, '\n')
 
 # Test on Potentially non-smoker subject
 TestnotSmoker = data.query(variables=['smoking'],
-                           evidence={'systolic': 81, 'relaxation': 71, 'HDL': 103, 'hemoglobin': 16,
+                           evidence={'Gtp': 55, 'triglyceride': 112, 'LDL': 113,'systolic': 81, 'relaxation': 71, 'HDL': 103, 'hemoglobin': 16,
                                      'serum creatinine': 2, 'tartar': 1})
 
 prGreen('\nTest on Potentially non-smoker subject:')
@@ -318,7 +314,7 @@ print(TestnotSmoker, '\n')
 
 # Potential smoker
 smoker = data.query(variables=['smoking'],
-                    evidence={'systolic': 93, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 18,
+                    evidence={'Gtp': 55, 'triglyceride': 150, 'LDL': 113,'systolic': 93, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 18,
                               'serum creatinine': 5, 'tartar': 1})
 
 prRed('\nProbability for a potential smoker:')
@@ -326,7 +322,7 @@ print(smoker)
 
 # Test on subject potentially smoker
 TestSmoker = data.query(variables=['smoking'],
-                        evidence={'systolic': 75, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 14,
+                        evidence={'Gtp': 30, 'triglyceride': 112, 'LDL': 116 ,'systolic': 75, 'relaxation': 43, 'HDL': 50, 'hemoglobin': 14,
                                   'serum creatinine': 5, 'tartar': 0})
 
 prRed('\nTest on Subject potentially smoker:')
