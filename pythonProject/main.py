@@ -63,8 +63,8 @@ df_smoke["tartar"] = df_smoke["tartar"].replace("N", 0)
 df_smoke["tartar"] = df_smoke["tartar"].replace("Y", 1)
 
 # Data overview
-print("\ndisplay (partial) of the dataframe\n", df_smoke)
-
+print("\ndisplay (partial) of the dataframe\n", df_smoke.head())
+print("\nInfo dataset:\n", df_smoke.describe())
 # Input dataset, eliminating the last column (needed for the output)
 X = df_smoke.drop("smoking", axis=1)
 Y = df_smoke["smoking"]
