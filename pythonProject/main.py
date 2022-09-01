@@ -293,7 +293,7 @@ bNet.fit(df_smoke, estimator=MaximumLikelihoodEstimator)
 # Probability calculation for a supposedly non-smoker (0) and a smoker (1)
 
 # Elimination of irrelevant variables
-data = VariableElimination(bNet)
+data = VariableElimination(bNet)  # inference
 
 # Potential non-smoker subject
 notSmoker = data.query(variables=['smoking'],
