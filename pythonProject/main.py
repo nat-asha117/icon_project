@@ -63,7 +63,7 @@ df_smoke["tartar"] = df_smoke["tartar"].replace("N", 0)
 df_smoke["tartar"] = df_smoke["tartar"].replace("Y", 1)
 
 # Data overview
-print("\ndisplay (partial) of the dataframe\n", df_smoke.head())
+print("\nDisplay (partial) of the dataframe:\n", df_smoke.head())
 print("\nInfo dataset:\n", df_smoke.describe())
 # Input dataset, eliminating the last column (needed for the output)
 X = df_smoke.drop("smoking", axis=1)
@@ -244,7 +244,7 @@ for train_index, test_index in kf.split(X, y):
 # Visualization of the table with metrics
 df_smoke_models_concat = pd.concat(model_report(model), axis=0).reset_index()  # concatenation of the models
 df_smoke_models_concat = df_smoke_models_concat.drop('index', axis=1)  # removal of the index
-print(df_smoke_models_concat)  # table display
+print("\n", df_smoke_models_concat)  # table display
 
 
 # VERIFICATION OF THE IMPORTANCE OF FEATURES
