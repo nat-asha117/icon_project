@@ -28,27 +28,33 @@ from sklearn.utils import resample
 def prPurple(prt):
     print("\033[95m{}\033[00m".format(prt))
 
+
 def prRedMoreString(prt, prt2, prt3):
     print("\033[91m{}\033[00m".format(prt), prt2, prt3)
+
 
 def prGreenMoreString(prt, prt2, prt3):
     print("\n\033[92m{}\033[00m".format(prt), prt2, prt3)
 
+
 def prRed(prt):
     print("\033[91m{}\033[00m".format(prt))
+
 
 def prGreen(prt):
     print("\033[92m{}\033[00m".format(prt))
 
+
 def prYellow(prt):
     print("\033[93m{}\033[00m".format(prt))
+
 
 def autopct(pct):
     return ('%.2f' % pct + "%") if pct > 1 else ''  # shows only values of labers that are greater than 1%
 
 
 # Import of the dataset
-df = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
+df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
 
 prYellow("\n\n\t\t\t\t\t\t\t\tWelcome to our system!\n\n\t"
          "It allows you to predict whether, taken of the subjects, they are smokers or not.\n\n")
@@ -56,7 +62,8 @@ prYellow("\n\n\t\t\t\t\t\t\t\tWelcome to our system!\n\n\t"
 # DATASET OPTIMIZATION:
 
 # Deleting unused and/or irrelevant columns
-df_smoke = df.drop(["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "oral"], axis=1)
+df_smoke = df.drop(["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "oral"],
+                   axis=1)
 
 # String to full conversion + dataframe cleaning
 df_smoke["tartar"] = df_smoke["tartar"].replace("N", 0)
@@ -68,7 +75,6 @@ print("\nInfo dataset:\n", df_smoke.describe())
 # Input dataset, eliminating the last column (needed for the output)
 X = df_smoke.drop("smoking", axis=1)
 Y = df_smoke["smoking"]
-
 
 # BALANCING OF CLASSES
 
@@ -87,8 +93,8 @@ prGreenMoreString('Smoke-free:', df_smoke.smoking.value_counts()[0],
 prRedMoreString('Presence of smoke:', df_smoke.smoking.value_counts()[1],
                 '(% {:.2f})'.format(df_smoke.smoking.value_counts()[1] / df_smoke.smoking.count() * 100))
 
-df_majority = df_smoke[df_smoke["smoking"]==0]
-df_minority = df_smoke[df_smoke["smoking"]==1]
+df_majority = df_smoke[df_smoke["smoking"] == 0]
+df_minority = df_smoke[df_smoke["smoking"] == 1]
 df_minority_upsampled = resample(df_minority, replace=True, n_samples=4473, random_state=42)
 df_smoke = pd.concat([df_minority_upsampled, df_majority])
 
@@ -97,7 +103,6 @@ prGreenMoreString('Smoke-free:', df_smoke.smoking.value_counts()[0],
                   '(% {:.2f})'.format(df_smoke.smoking.value_counts()[0] / df_smoke.smoking.count() * 100))
 prRedMoreString('Presence of smoke:', df_smoke.smoking.value_counts()[1],
                 '(% {:.2f})'.format(df_smoke.smoking.value_counts()[1] / df_smoke.smoking.count() * 100))
-
 
 # Visualization of the aspect ratio chart
 labels = ["Not smokers", "Smokers"]
@@ -230,14 +235,14 @@ for train_index, test_index in kf.split(X, y):
         df_smoke_models = []
 
         for clf in model:
-         df_smoke_model = pd.DataFrame({'model'     : [clf],
-                                        'accuracy'  : [np.mean(model[clf]['accuracy_list'])],
-                                        'precision' : [np.mean(model[clf]['precision_list'])],
-                                        'recall'    : [np.mean(model[clf]['recall_list'])],
-                                        'f1score'   : [np.mean(model[clf]['f1_list'])]
-                                        })
+            df_smoke_model = pd.DataFrame({'model': [clf],
+                                           'accuracy': [np.mean(model[clf]['accuracy_list'])],
+                                           'precision': [np.mean(model[clf]['precision_list'])],
+                                           'recall': [np.mean(model[clf]['recall_list'])],
+                                           'f1score': [np.mean(model[clf]['f1_list'])]
+                                           })
 
-         df_smoke_models.append(df_smoke_model)
+            df_smoke_models.append(df_smoke_model)
 
         return df_smoke_models
 
@@ -245,7 +250,6 @@ for train_index, test_index in kf.split(X, y):
 df_smoke_models_concat = pd.concat(model_report(model), axis=0).reset_index()  # concatenation of the models
 df_smoke_models_concat = df_smoke_models_concat.drop('index', axis=1)  # removal of the index
 print("\n", df_smoke_models_concat)  # table display
-
 
 # VERIFICATION OF THE IMPORTANCE OF FEATURES
 
@@ -268,7 +272,6 @@ plt.title("Top features derived by Random Forest")
 plt.ylabel("")
 plt.show()
 
-
 # CREATION OF THE BAYESIAN NETWORK
 
 # Converting all values within the dataframe to integers
@@ -288,7 +291,6 @@ k2_model = hc_k2.estimate(scoring_method=k2)
 bNet = BayesianNetwork(k2_model.edges())
 bNet.fit(df_smoke, estimator=MaximumLikelihoodEstimator)
 
-
 # CALCULATION OF THE PROBABILITY
 # Probability calculation for a supposedly non-smoker (0) and a smoker (1)
 
@@ -297,7 +299,7 @@ data = VariableElimination(bNet)  # inference
 
 # Potential non-smoker subject
 notSmoker = data.query(variables=['smoking'],
-                       evidence={'Gtp': 31, 'triglyceride': 113, 'LDL': 116, 'systolic': 102,  'relaxation': 71,
+                       evidence={'Gtp': 31, 'triglyceride': 113, 'LDL': 116, 'systolic': 102, 'relaxation': 71,
                                  'HDL': 103, 'hemoglobin': 13, 'serum creatinine': 2, 'tartar': 0})
 
 prGreen('\nProbability for a potentially non-smoker:')
@@ -326,3 +328,37 @@ TestSmoker = data.query(variables=['smoking'],
 
 prRed('\nTest on Subject potentially smoker:')
 print(TestSmoker, '\n')
+
+while True:
+    i = 0
+    try:
+        prYellow("Do you want to enter your data for a prediction? - Y/N? - (Typing 'n' close program)")
+        result = str(input())
+        if 'N' == result or result == 'n':
+            exit(1)
+        elif 'Y' == result or result == 'y':
+            prYellow("Please insert: ")
+            columns = ["Gtp", "triglyceride", "LDL", "systolic", "relaxation", "HDL", "hemoglobin", "serum creatinine",
+                       "tartar"]
+            print(columns)
+            value = [None] * len(columns)
+            while i < len(columns):
+                print("Insert ", columns[i], " value: ")
+                value[i] = int(input())
+                if value[i] < 0:
+                    prRed("Insert value > 0")
+                else:
+                    i = i + 1
+            try:
+                UserInput = data.query(variables=['smoking'],
+                                       evidence={'Gtp': value[0], 'triglyceride': value[1], 'LDL': value[2], 'systolic': value[3],
+                                                 'relaxation': value[4],
+                                                 'HDL': value[5], 'hemoglobin': value[6], 'serum creatinine': value[7], 'tartar': value[8]})
+                print(UserInput)
+            except IndexError as e:
+                prRed("Error!")
+                print(e.args)
+        else:
+            print("Wrong input")
+    except ValueError:
+        print("Wrong input")
