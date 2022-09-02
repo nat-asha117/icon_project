@@ -54,7 +54,7 @@ def autopct(pct):
 
 
 # Import of the dataset
-df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
+df = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
 
 prYellow("\n\n\t\t\t\t\t\t\t\tWelcome to our system!\n\n\t"
          "It allows you to predict whether, taken of the subjects, they are smokers or not.\n\n")
@@ -330,6 +330,7 @@ TestSmoker = data.query(variables=['smoking'],
 prRed('\nTest on Subject potentially smoker:')
 print(TestSmoker, '\n')
 
+#
 while True:
     i = 0
     try:
@@ -352,9 +353,9 @@ while True:
                     i = i + 1
             try:
                 UserInput = data.query(variables=['smoking'],
-                                       evidence={'Gtp': value[0], 'triglyceride': value[1], 'LDL': value[2], 'systolic': value[3],
-                                                 'relaxation': value[4],
-                                                 'HDL': value[5], 'hemoglobin': value[6], 'serum creatinine': value[7], 'tartar': value[8]})
+                                       evidence={'Gtp': value[0], 'triglyceride': value[1], 'LDL': value[2],
+                                                 'systolic': value[3], 'relaxation': value[4], 'HDL': value[5],
+                                                 'hemoglobin': value[6], 'serum creatinine': value[7], 'tartar': value[8]})
                 print(UserInput)
             except IndexError as e:
                 prRed("Error!")
