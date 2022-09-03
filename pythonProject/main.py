@@ -54,7 +54,7 @@ def autopct(pct):
 
 
 # Import of the dataset
-df = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
+df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
 
 prYellow("\n\n\t\t\t\t\t\t\t\tWelcome to our system!\n\n\t"
          "It allows you to predict whether, taken of the subjects, they are smokers or not.\n\n")
@@ -307,12 +307,12 @@ prGreen('\nProbability for a potentially non-smoker:')
 print(notSmoker, '\n')
 
 # Test on Potentially non-smoker subject
-TestnotSmoker = data.query(variables=['smoking'],
+TestNotSmoker = data.query(variables=['smoking'],
                            evidence={'Gtp': 53, 'triglyceride': 148, 'LDL': 116, 'systolic': 102, 'relaxation': 71,
                                      'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'tartar': 1})
 
 prGreen('\nTest on Potentially non-smoker subject:')
-print(TestnotSmoker, '\n')
+print(TestNotSmoker, '\n')
 
 # Potential smoker
 smoker = data.query(variables=['smoking'],
@@ -345,10 +345,15 @@ while True:
             print(columns)
             value = [None] * len(columns)
             while i < len(columns):
-                print("Insert ", columns[i], " value: ")
+                if columns[i] != "tartar":
+                    print("Insert ", columns[i], " value: ")
+                else:
+                    print("Insert ", columns[i], " value (0 = No, 1 = Yes): ")
                 value[i] = int(input())
-                if value[i] < 0:
-                    prRed("Insert value > 0")
+                if value[i] <= -1:
+                    prRed("Insert value >= 0")
+                elif (columns[i] == "tartar") and (value[i] > 1):
+                    prRed("Error! Insert value (0 = No, 1 = Yes): ")
                 else:
                     i = i + 1
             try:
