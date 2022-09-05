@@ -1,91 +1,135 @@
 # Ingegneria della conoscenza
 # Natasha Fabrizio - Francesco Saverio Cassano
 
-import sklearn
-import pandas as pd
-import numpy as np
+# Main libraries
 import matplotlib.pyplot as plt
-import pgmpy
+import numpy as np
+import pandas as pd
 
-from numpy import mean
-from numpy import std
-from sklearn import model_selection
-from sklearn import metrics
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn import preprocessing
-from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
+# Classification models
 from pgmpy.estimators import K2Score, HillClimbSearch, MaximumLikelihoodEstimator
-from pgmpy.models import BayesianNetwork
 from pgmpy.inference import VariableElimination
-from sklearn import svm
+from pgmpy.models import BayesianNetwork
+
+# Machine learning
+from sklearn import metrics
+from sklearn.model_selection import StratifiedKFold
+
+# Classification algorithms
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import GaussianNB, BernoulliNB
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.utils import resample
 
-df_smoke = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
-print()
-print()
-print("Benvenuto nel nostro sistema per predire se, presi dei soggetti, essi sono fumatori o meno.\n")
-print()
-print()
-# print(df_smoke)
-print()
 
-# conversione da stringa a intero + pulizia dataframe - POTREBBE NON SERVIRE!
-# df_smoke["gender"] = df_smoke["gender"].replace("M", 0)
-# df_smoke["gender"] = df_smoke["gender"].replace("F", 1)
+# Support methods
+def prPurple(prt):
+    print("\033[95m{}\033[00m".format(prt))
 
-df_smoke = df_smoke.drop(
-    ["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "AST", "ALT", "Gtp",
-     "oral", "tartar"], axis=1)
-# df_smoke["gender"] = df_smoke ["gender"].astype(int)
 
-print(df_smoke)
+def prRedMoreString(prt, prt2, prt3):
+    print("\033[91m{}\033[00m".format(prt), prt2, prt3)
 
-# dataset di input eliminando l'ultima colonna in quanto servirà per l'output
+
+def prGreenMoreString(prt, prt2, prt3):
+    print("\n\033[92m{}\033[00m".format(prt), prt2, prt3)
+
+
+def prRed(prt):
+    print("\033[91m{}\033[00m".format(prt))
+
+
+def prGreen(prt):
+    print("\033[92m{}\033[00m".format(prt))
+
+
+def prYellow(prt):
+    print("\033[93m{}\033[00m".format(prt))
+
+
+def autopct(pct):
+    return ('%.2f' % pct + "%") if pct > 1 else ''  # shows only values of labers that are greater than 1%
+
+
+# Import of the dataset
+df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
+
+prYellow("\n\n\t\t\t\t\t\t\t\tWelcome to our system!\n\n\t"
+         "It allows you to predict whether, taken of the subjects, they are smokers or not.\n\n")
+
+# DATASET OPTIMIZATION:
+
+# Deleting unused and/or irrelevant columns
+df_smoke = df.drop(["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "oral"],
+                   axis=1)
+
+# String to full conversion + dataframe cleaning
+df_smoke["tartar"] = df_smoke["tartar"].replace("N", 0)
+df_smoke["tartar"] = df_smoke["tartar"].replace("Y", 1)
+
+# Data overview
+print("\nDisplay (partial) of the dataframe:\n", df_smoke.head())
+print("\nNumber of elements: ", len(df_smoke.index)-1)
+print("\nInfo dataset:\n", df_smoke.describe())
+# Input dataset, eliminating the last column (needed for the output)
 X = df_smoke.drop("smoking", axis=1)
 Y = df_smoke["smoking"]
 
-# BILANCIAMENTO DELLE CLASSI
-# Proporzione dei non malati di tiroide (0) e malati di tiroide (1):
-# [Numero di (non) malati di tiroide/Numero totale di pazienti]
-print()
-print('non presenza fumo:', df_smoke.smoking.value_counts()[0],
-      '(% {:.2f})'.format(df_smoke.smoking.value_counts()[0] / df_smoke.smoking.count() * 100))
-print('presenza fumo:', df_smoke.smoking.value_counts()[1],
-      '(% {:.2f})'.format(df_smoke.smoking.value_counts()[1] / df_smoke.smoking.count() * 100), '\n')
+# BALANCING OF CLASSES
 
-
-# Visualizzazione del grafico
-def autopct(pct):  # Mostra solo i valori delle laber che sono superiori al 10%
-    return ('%.2f' % pct + "%") if pct > 10 else ''
-
-
-labels = ["Fumatori", "Non fumatori"]
-ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(4, 4), autopct=autopct, labels=None)
+# Visualization of the aspect ratio chart
+labels = ["Not smokers", "Smokers"]
+ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(5, 5), autopct=autopct, labels=None)
 ax.axes.get_yaxis().set_visible(False)
+plt.title("Graph of occurrence of smokers and non-smokers")
+plt.legend(labels=labels, loc="best")
+plt.show()
+
+# Proportion of non-smokers (0) and smokers (1):
+# [Number of non-smokers/Total number of smokers]
+prGreenMoreString('Smoke-free:', df_smoke.smoking.value_counts()[0],
+                  '(% {:.2f})'.format(df_smoke.smoking.value_counts()[0] / df_smoke.smoking.count() * 100))
+prRedMoreString('Presence of smoke:', df_smoke.smoking.value_counts()[1],
+                '(% {:.2f})'.format(df_smoke.smoking.value_counts()[1] / df_smoke.smoking.count() * 100))
+
+df_majority = df_smoke[df_smoke["smoking"] == 0]
+df_minority = df_smoke[df_smoke["smoking"] == 1]
+df_minority_upsampled = resample(df_minority, replace=True, n_samples=4473, random_state=42)
+df_smoke = pd.concat([df_minority_upsampled, df_majority])
+
+prYellow("\nValue after Oversampling:")
+prGreenMoreString('Smoke-free:', df_smoke.smoking.value_counts()[0],
+                  '(% {:.2f})'.format(df_smoke.smoking.value_counts()[0] / df_smoke.smoking.count() * 100))
+prRedMoreString('Presence of smoke:', df_smoke.smoking.value_counts()[1],
+                '(% {:.2f})'.format(df_smoke.smoking.value_counts()[1] / df_smoke.smoking.count() * 100))
+
+# Visualization of the aspect ratio chart
+labels = ["Not smokers", "Smokers"]
+ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(5, 5), autopct=autopct, labels=None)
+ax.axes.get_yaxis().set_visible(False)
+plt.title("Graph of occurrence of smokers and non-smokers\n\nafter Oversampling")
 plt.legend(labels=labels, loc="best")
 plt.show()
 
 # EVALUATION SELECTION: K-FOLD CROSS VALIDATION
 
-# Creazione della feature X e del target y
-X = df_smoke.to_numpy()                                                         # Questo forse va eliminato qui o sopra
+# Creation of X feature and target y
+X = df_smoke.to_numpy()
 y = df_smoke["smoking"].to_numpy()  # K-Fold Cross Validation
 
-kf = StratifiedKFold(n_splits=5)  # La classe è in squilibrio, quindi utilizzo Stratified K-Fold ???
+kf = StratifiedKFold(n_splits=5)  # used because the class is unbalanced
 
-# Classificatori per la valutazione
+# Classifiers for the purpose of evaluation
 knn = KNeighborsClassifier()
 dtc = DecisionTreeClassifier()
 rfc = RandomForestClassifier()
 svc = SVC()
+bnb = BernoulliNB()
+gnb = GaussianNB()
 
-# Score delle metriche
+# Score of metrics
 model = {
     'KNN': {'accuracy_list': 0.0,
             'precision_list': 0.0,
@@ -109,35 +153,52 @@ model = {
             'precision_list': 0.0,
             'recall_list': 0.0,
             'f1_list': 0.0
-            }
+            },
+
+    'BernoulliNB': {'accuracy_list': 0.0,
+                    'precision_list': 0.0,
+                    'recall_list': 0.0,
+                    'f1_list': 0.0
+                    },
+
+    'GaussianNB': {'accuracy_list': 0.0,
+                   'precision_list': 0.0,
+                   'recall_list': 0.0,
+                   'f1_list': 0.0
+                   }
+
 }
 
-# K-Fold dei classificatori
+# K-Fold of the classifiers
 for train_index, test_index in kf.split(X, y):
     training_set, testing_set = X[train_index], X[test_index]
 
-    # Dati di train
+    # train data
     data_train = pd.DataFrame(training_set, columns=df_smoke.columns)
     X_train = data_train.drop("smoking", axis=1)
     y_train = data_train.smoking
 
-    # Dati di test
+    # test data
     data_test = pd.DataFrame(testing_set, columns=df_smoke.columns)
     X_test = data_test.drop("smoking", axis=1)
     y_test = data_test.smoking
 
-    # Fit dei classificatori
+    # classifier fit
     knn.fit(X_train, y_train)
     dtc.fit(X_train, y_train)
     rfc.fit(X_train, y_train)
     svc.fit(X_train, y_train)
+    bnb.fit(X_train, y_train)
+    gnb.fit(X_train, y_train)
 
     y_pred_knn = knn.predict(X_test)
     y_pred_dtc = dtc.predict(X_test)
     y_pred_rfc = rfc.predict(X_test)
     y_pred_SVM = svc.predict(X_test)
+    y_pred_gnb = gnb.predict(X_test)
+    y_pred_bnb = bnb.predict(X_test)
 
-    # Salvo le metriche del fold nel dizionario
+    # saving fold metrics in the dictionary
     model['KNN']['accuracy_list'] = (metrics.accuracy_score(y_test, y_pred_knn))
     model['KNN']['precision_list'] = (metrics.precision_score(y_test, y_pred_knn))
     model['KNN']['recall_list'] = (metrics.recall_score(y_test, y_pred_knn))
@@ -158,94 +219,153 @@ for train_index, test_index in kf.split(X, y):
     model['SVM']['recall_list'] = (metrics.recall_score(y_test, y_pred_SVM))
     model['SVM']['f1_list'] = (metrics.f1_score(y_test, y_pred_SVM))
 
+    model['BernoulliNB']['accuracy_list'] = (metrics.accuracy_score(y_test, y_pred_bnb))
+    model['BernoulliNB']['precision_list'] = (metrics.precision_score(y_test, y_pred_bnb))
+    model['BernoulliNB']['recall_list'] = (metrics.recall_score(y_test, y_pred_bnb))
+    model['BernoulliNB']['f1_list'] = (metrics.f1_score(y_test, y_pred_bnb))
 
-# Modello di rapporto
-def model_report(model):
-    df_smoke_models = []
-
-    for clf in model:
-        df_smoke_model = pd.DataFrame({'model': [clf],
-                                       'accuracy': [np.mean(model[clf]['accuracy_list'])],
-                                       'precision': [np.mean(model[clf]['precision_list'])],
-                                       'recall': [np.mean(model[clf]['recall_list'])],
-                                       'f1score': [np.mean(model[clf]['f1_list'])]
-                                       })
-
-        df_smoke_models.append(df_smoke_model)
-
-    return df_smoke_models
+    model['GaussianNB']['accuracy_list'] = (metrics.accuracy_score(y_test, y_pred_gnb))
+    model['GaussianNB']['precision_list'] = (metrics.precision_score(y_test, y_pred_gnb))
+    model['GaussianNB']['recall_list'] = (metrics.recall_score(y_test, y_pred_gnb))
+    model['GaussianNB']['f1_list'] = (metrics.f1_score(y_test, y_pred_gnb))
 
 
-# Visualizzazione della tabella con le metriche
-df_smoke_models_concat = pd.concat(model_report(model), axis=0).reset_index()  # Concatenazione dei modelli
-df_smoke_models_concat = df_smoke_models_concat.drop('index', axis=1)  # Rimozione dell'indice
-print(df_smoke_models_concat)  # Visualizzazione della tabella
+    # report template
+    def model_report(model):
 
-# VERIFICA DELL'IMPORTANZA DELLE FEATURES
-# Creazione della feature X e del target y
+        df_smoke_models = []
+
+        for clf in model:
+            df_smoke_model = pd.DataFrame({'model': [clf],
+                                           'accuracy': [np.mean(model[clf]['accuracy_list'])],
+                                           'precision': [np.mean(model[clf]['precision_list'])],
+                                           'recall': [np.mean(model[clf]['recall_list'])],
+                                           'f1score': [np.mean(model[clf]['f1_list'])]
+                                           })
+
+            df_smoke_models.append(df_smoke_model)
+
+        return df_smoke_models
+
+# Visualization of the table with metrics
+df_smoke_models_concat = pd.concat(model_report(model), axis=0).reset_index()  # concatenation of the models
+df_smoke_models_concat = df_smoke_models_concat.drop('index', axis=1)  # removal of the index
+print("\n", df_smoke_models_concat)  # table display
+
+# VERIFICATION OF THE IMPORTANCE OF FEATURES
+
+# Creation of X feature and target y
 X = df_smoke.drop('smoking', axis=1)
 y = df_smoke['smoking']
 
-# Classificatore da utilizzare per la ricerca delle feature principali
+# Classifier to be used for the search of the main features
 rfc = RandomForestClassifier(random_state=42, n_estimators=100)
 rfc_model = rfc.fit(X, y)
 
-# Tracciamento delle feature in base alla loro importanza
-plt.style.use('ggplot')
-(pd.Series(rfc_model.feature_importances_, index=X.columns)
- .nlargest(10)  # Numero massimo di feature da visualizzare
- .plot(kind='barh', figsize=[10, 5])  # Tipo di grafico e dimensione
- .invert_yaxis())  # Assicuro un ordine decrescente
+# Tracking features based on their importance
+ax = (pd.Series(rfc_model.feature_importances_, index=X.columns)
+      .nlargest(10)  # maximum number of features to display
+      .plot(kind='pie', figsize=(6, 6), autopct=autopct)  # type of chart and size
+      .invert_yaxis())  # to ensure a descending order
 
-# Visualizzazione del grafico
-plt.title('Top features derived by Random Forest', size=20)
-plt.yticks(size=15)
+# Visualization of the graph of the most important features
+plt.title("Top features derived by Random Forest")
+plt.ylabel("")
 plt.show()
 
-# CREAZIONE DELLA RETE BAYESIANA
-# Conversione di tutti i valori all'interno del dataframe in interi
+# CREATION OF THE BAYESIAN NETWORK
+
+# Converting all values within the dataframe to integers
 df_smoke_int = np.array(df_smoke, dtype=int)
 df_smoke = pd.DataFrame(df_smoke_int, columns=df_smoke.columns)
 
-# Creazione della feature X e del target y
+# Creation of X feature and target y
 X_train = df_smoke
 y_train = df_smoke["smoking"]
 
-# Creazione della struttura della rete
+# Creation of the network structure
 k2 = K2Score(X_train)
 hc_k2 = HillClimbSearch(X_train)
 k2_model = hc_k2.estimate(scoring_method=k2)
 
-# Creazione della rete
+# Creation of the network
 bNet = BayesianNetwork(k2_model.edges())
 bNet.fit(df_smoke, estimator=MaximumLikelihoodEstimator)
 
-# Visualizzazione dei nodi e degli archi  - DA TOGLIERE!
-print('\033[1m' + '\nNodi della rete:\n' + '\033[0m', bNet.nodes)
-print('\033[1m' + '\nArchi della rete:\n' + '\033[0m', bNet.edges)
+# CALCULATION OF THE PROBABILITY
+# Probability calculation for a supposedly non-smoker (0) and a smoker (1)
 
-# CALCOLO DELLA PROBABILITÀ
+# Elimination of irrelevant variables
+data = VariableElimination(bNet)  # inference
 
-# Calcolo della probabilità per un soggetto presumibilmente non diabetico (0) ed uno diabetico (1) di avere il diabete
-
-# Eliminazione delle variabili ininfluenti
-data = VariableElimination(bNet)
-
-# Soggetto potenzialmente non fumatore
+# Potential non-smoker subject
 notSmoker = data.query(variables=['smoking'],
-                       evidence={'age': 55, 'height(cm)': 170, 'weight(kg)': 60, 'waist(cm)': 8,
-                                 'hemoglobin': 158, 'dental caries': 0})
+                       evidence={'Gtp': 31, 'triglyceride': 113, 'LDL': 116, 'systolic': 102, 'relaxation': 71,
+                                 'HDL': 103, 'hemoglobin': 13, 'serum creatinine': 2, 'tartar': 0})
 
-print('\nProbabilità per un soggetto potenzialmente non fumatore:')
+prGreen('\nProbability for a potentially non-smoker:')
 print(notSmoker, '\n')
 
-"""
-# Soggetto potenzialmente fumatore
-smoker = data.query(variables=['smoking'],
-                    evidence={'age': 40, 'height(cm)': 155, 'weight(kg)': 45, 'waist(cm)': 590, 'systolic': 950,
-                              'relaxation': 520, 'fasting blood sugar': 810, 'Cholesterol': 1550,
-                              'triglyceride': 470, 'HDL': 880, 'LDL': 570, 'hemoglobin': 126, 'dental caries': 0})
+# Test on Potentially non-smoker subject
+TestNotSmoker = data.query(variables=['smoking'],
+                           evidence={'Gtp': 53, 'triglyceride': 148, 'LDL': 116, 'systolic': 102, 'relaxation': 71,
+                                     'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'tartar': 1})
 
-print('\nProbabilità per un soggetto potenzialmente fumatore:')
+prGreen('\nTest on Potentially non-smoker subject:')
+print(TestNotSmoker, '\n')
+
+# Potential smoker
+smoker = data.query(variables=['smoking'],
+                    evidence={'Gtp': 55, 'triglyceride': 151, 'LDL': 113, 'systolic': 93, 'relaxation': 43, 'HDL': 50,
+                              'hemoglobin': 18, 'serum creatinine': 5, 'tartar': 1})
+
+prRed('\nProbability for a potential smoker:')
 print(smoker)
-"""
+
+# Test on subject potentially smoker
+TestSmoker = data.query(variables=['smoking'],
+                        evidence={'Gtp': 32, 'triglyceride': 111, 'LDL': 113, 'systolic': 93, 'relaxation': 43,
+                                  'HDL': 50, 'hemoglobin': 13, 'serum creatinine': 5, 'tartar': 0})
+
+prRed('\nTest on Subject potentially smoker:')
+print(TestSmoker, '\n')
+
+#
+while True:
+    i = 0
+    try:
+        prYellow("Do you want to enter your data for a prediction? - Y/N? - (Typing 'n' close program)")
+        result = str(input())
+        if 'N' == result or result == 'n':
+            exit(1)
+        elif 'Y' == result or result == 'y':
+            prYellow("Please insert: ")
+            columns = ["Gtp", "triglyceride", "LDL", "systolic", "relaxation", "HDL", "hemoglobin", "serum creatinine",
+                       "tartar"]
+            print(columns)
+            value = [None] * len(columns)
+            while i < len(columns):
+                if columns[i] != "tartar":
+                    print("Insert ", columns[i], " value: ")
+                else:
+                    print("Insert ", columns[i], " value (0 = No, 1 = Yes): ")
+                value[i] = int(input())
+                if value[i] <= -1:
+                    prRed("Insert value >= 0")
+                elif (columns[i] == "tartar") and (value[i] > 1):
+                    prRed("Error! Insert value (0 = No, 1 = Yes): ")
+                else:
+                    i = i + 1
+            try:
+                UserInput = data.query(variables=['smoking'],
+                                       evidence={'Gtp': value[0], 'triglyceride': value[1], 'LDL': value[2],
+                                                 'systolic': value[3], 'relaxation': value[4], 'HDL': value[5],
+                                                 'hemoglobin': value[6], 'serum creatinine': value[7], 'tartar': value[8]})
+                print(UserInput)
+            except IndexError as e:
+                prRed("Error!")
+                print(e.args)
+        else:
+            print("Wrong input")
+    except ValueError:
+        print("Wrong input")
