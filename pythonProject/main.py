@@ -292,6 +292,11 @@ k2_model = hc_k2.estimate(scoring_method=k2)
 bNet = BayesianNetwork(k2_model.edges())
 bNet.fit(df_smoke, estimator=MaximumLikelihoodEstimator)
 
+# Information about bNet
+
+prYellow("Markov blanket for \"smoking\"")
+print(bNet.get_markov_blanket('smoking'))
+
 # CALCULATION OF THE PROBABILITY
 # Probability calculation for a supposedly non-smoker (0) and a smoker (1)
 
