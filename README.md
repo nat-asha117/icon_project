@@ -2,7 +2,7 @@
 
 Il seguente progetto è stato creato dal seguente gruppo:
 
-- Natasha Fabrizio
+- Natasha Fabrizio [MAT 717446]
 - Francesco Saverio Cassano [MAT 716133]
 
 Il progetto è stato creato per sostenere l'esame di *Ingegneria Della Conoscenza*.<p>
