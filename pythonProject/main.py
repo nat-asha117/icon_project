@@ -89,9 +89,9 @@ plt.show()
 
 # Proportion of non-smokers (0) and smokers (1):
 # [Number of non-smokers/Total number of smokers]
-prGreenMoreString('Smoke-free:', df_smoke.smoking.value_counts()[0],
+prGreenMoreString('Not smokers: ', df_smoke.smoking.value_counts()[0],
                   '(% {:.2f})'.format(df_smoke.smoking.value_counts()[0] / df_smoke.smoking.count() * 100))
-prRedMoreString('Presence of smoke:', df_smoke.smoking.value_counts()[1],
+prRedMoreString('Smokers: ', df_smoke.smoking.value_counts()[1],
                 '(% {:.2f})'.format(df_smoke.smoking.value_counts()[1] / df_smoke.smoking.count() * 100))
 
 df_majority = df_smoke[df_smoke["smoking"] == 0]
@@ -100,9 +100,9 @@ df_minority_upsampled = resample(df_minority, replace=True, n_samples=4473, rand
 df_smoke = pd.concat([df_minority_upsampled, df_majority])
 
 prYellow("\nValue after Oversampling:")
-prGreenMoreString('Smoke-free:', df_smoke.smoking.value_counts()[0],
+prGreenMoreString('Not smokers: ', df_smoke.smoking.value_counts()[0],
                   '(% {:.2f})'.format(df_smoke.smoking.value_counts()[0] / df_smoke.smoking.count() * 100))
-prRedMoreString('Presence of smoke:', df_smoke.smoking.value_counts()[1],
+prRedMoreString('Smokers: ', df_smoke.smoking.value_counts()[1],
                 '(% {:.2f})'.format(df_smoke.smoking.value_counts()[1] / df_smoke.smoking.count() * 100))
 
 # Visualization of the aspect ratio chart
@@ -379,7 +379,7 @@ while True:
                                                  'hemoglobin': value[9], 'serum creatinine': value[10],
                                                  'tartar': value[11]})
                 print(UserInput)
-                if UserInput.values[0] < 0.50:
+                if UserInput.values[0] <= 0.50:
                     try:
                         prYellow("Want to know what values to improve not to be to no longer be considered a smoker?"
                                  " - Y/N")
