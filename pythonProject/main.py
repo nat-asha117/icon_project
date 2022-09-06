@@ -49,6 +49,7 @@ def prYellow(prt):
     print("\033[93m{}\033[00m".format(prt))
 
 
+
 def autopct(pct):
     return ('%.2f' % pct + "%") if pct > 1 else ''  # shows only values of labers that are greater than 1%
 
@@ -298,7 +299,7 @@ bNet.fit(df_smoke, estimator=MaximumLikelihoodEstimator)
 
 prYellow("\nMarkov blanket for \"smoking\"")
 print(bNet.get_markov_blanket('smoking'), "\n")
-print(bNet.simulate(n_samples=3, evidence={"smoking": 0, 'age': 55}))
+# print(MaximumLikelihoodEstimator(bNet, df_smoke).estimate_cpd('Gtp'))
 
 
 # CALCULATION OF THE PROBABILITY
@@ -309,12 +310,15 @@ data = VariableElimination(bNet)  # inference
 
 
 # Potential non-smoker subject
+prGreen("Tests carried out on an average person with values:")
+print("age: 20\t-\theight(cm): 170\t-\tweight(kg): 60\n")
 notSmoker = data.query(variables=['smoking'],
                        evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 113, 'LDL': 116, 'systolic': 102, 'relaxation': 71,
                                  'HDL': 103, 'hemoglobin': 13, 'serum creatinine': 2, 'tartar': 0})
 
 prGreen('\nProbability for a potentially non-smoker:')
 print(notSmoker, '\n')
+
 
 
 # Test on Potentially non-smoker subject
@@ -335,7 +339,7 @@ print(smoker)
 
 # Test on subject potentially smoker
 TestSmoker = data.query(variables=['smoking'],
-                        evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 32, 'triglyceride': 111, 'LDL': 113, 'systolic': 93, 'relaxation': 43,
+                        evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 32, 'triglyceride': 130, 'LDL': 113, 'systolic': 93, 'relaxation': 43,
                                   'HDL': 50, 'hemoglobin': 13, 'serum creatinine': 5, 'tartar': 0})
 
 prRed('\nTest on Subject potentially smoker:')
@@ -375,6 +379,27 @@ while True:
                                                  'hemoglobin': value[9], 'serum creatinine': value[10],
                                                  'tartar': value[11]})
                 print(UserInput)
+                if UserInput.values[0] < 0.50:
+                    try:
+                        prYellow("Want to know what values to improve not to be to no longer be considered a smoker?"
+                                 " - Y/N")
+                        result = str(input())
+                        if 'Y' == result or result == 'y':
+                            newValue = bNet.simulate(show_progress=False, n_samples=1, evidence={"smoking": 0, 'age': value[0], 'height(cm)': value[1],
+                                                                 'weight(kg)': value[2]})
+                            newValue = newValue.drop(["Cholesterol", "smoking"], axis=1)
+                            prYellow("Suggested values:")
+                            print(newValue)
+                            UserInputUpdated = data.query(show_progress=False, variables=['smoking'],
+                                       evidence={'age': newValue.get("age")[0], 'height(cm)': newValue.get("height(cm)")[0], 'weight(kg)': newValue.get("weight(kg)")[0],
+                                                 'Gtp': newValue.get("Gtp")[0], 'triglyceride': newValue.get("triglyceride")[0], 'LDL': newValue.get("LDL")[0],
+                                                 'systolic': newValue.get("systolic")[0], 'relaxation': newValue.get("relaxation")[0], 'HDL': newValue.get("HDL")[0],
+                                                 'hemoglobin': newValue.get("hemoglobin")[0], 'serum creatinine': newValue.get("serum creatinine")[0],
+                                                 'tartar': newValue.get("tartar")[0]})
+                            prYellow("New probability based on suggested values")
+                            print(UserInputUpdated)
+                    except ValueError:
+                        print("Wrong input")
             except IndexError as e:
                 prRed("Error!")
                 print("You are insert:  ", value)
