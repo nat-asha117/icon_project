@@ -107,7 +107,7 @@ prRedMoreString('Presence of smoke:', df_smoke.smoking.value_counts()[1],
 
 # Visualization of the aspect ratio chart
 labels = ["Not smokers", "Smokers"]
-ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(5, 5), autopct=autopct, labels=None)
+ax = df_smoke['smoking'].value_counts().plot(kind='pie', figsize=(5.7, 5.7), autopct=autopct, labels=None)
 ax.axes.get_yaxis().set_visible(False)
 plt.title("Graph of occurrence of smokers and non-smokers\n\nafter Oversampling")
 plt.legend(labels=labels, loc="best")
@@ -275,6 +275,8 @@ plt.show()
 
 # CREATION OF THE BAYESIAN NETWORK
 
+prYellow("\n\t\tCreation of the Bayesian Network\n")
+
 # Converting all values within the dataframe to integers
 df_smoke_int = np.array(df_smoke, dtype=int)
 df_smoke = pd.DataFrame(df_smoke_int, columns=df_smoke.columns)
@@ -294,14 +296,17 @@ bNet.fit(df_smoke, estimator=MaximumLikelihoodEstimator)
 
 # Information about bNet
 
-prYellow("Markov blanket for \"smoking\"")
-print(bNet.get_markov_blanket('smoking'))
+prYellow("\nMarkov blanket for \"smoking\"")
+print(bNet.get_markov_blanket('smoking'),"\n")
+# print(bNet.simulate(n_samples=3, evidence={"smoking": 0, 'age': 55}))
+
 
 # CALCULATION OF THE PROBABILITY
 # Probability calculation for a supposedly non-smoker (0) and a smoker (1)
 
 # Elimination of irrelevant variables
 data = VariableElimination(bNet)  # inference
+
 
 # Potential non-smoker subject
 notSmoker = data.query(variables=['smoking'],
