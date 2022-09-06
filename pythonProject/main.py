@@ -62,8 +62,8 @@ prYellow("\n\n\t\t\t\t\t\t\t\tWelcome to our system!\n\n\t"
 # DATASET OPTIMIZATION:
 
 # Deleting unused and/or irrelevant columns
-df_smoke = df.drop(["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "oral"],
-                   axis=1)
+df_smoke = df.drop(["ID", "gender", "eyesight(left)", "eyesight(right)", "hearing(left)", "hearing(right)", "oral",
+                    "waist(cm)"], axis=1)
 
 # String to full conversion + dataframe cleaning
 df_smoke["tartar"] = df_smoke["tartar"].replace("N", 0)
@@ -112,7 +112,7 @@ ax.axes.get_yaxis().set_visible(False)
 plt.title("Graph of occurrence of smokers and non-smokers\n\nafter Oversampling")
 plt.legend(labels=labels, loc="best")
 plt.show()
-
+"""
 # EVALUATION SELECTION: K-FOLD CROSS VALIDATION
 
 # Creation of X feature and target y
@@ -272,7 +272,7 @@ ax = (pd.Series(rfc_model.feature_importances_, index=X.columns)
 plt.title("Top features derived by Random Forest")
 plt.ylabel("")
 plt.show()
-
+"""
 # CREATION OF THE BAYESIAN NETWORK
 
 prYellow("\n\t\tCreation of the Bayesian Network\n")
@@ -297,8 +297,8 @@ bNet.fit(df_smoke, estimator=MaximumLikelihoodEstimator)
 # Information about bNet
 
 prYellow("\nMarkov blanket for \"smoking\"")
-print(bNet.get_markov_blanket('smoking'),"\n")
-# print(bNet.simulate(n_samples=3, evidence={"smoking": 0, 'age': 55}))
+print(bNet.get_markov_blanket('smoking'), "\n")
+print(bNet.simulate(n_samples=3, evidence={"smoking": 0, 'age': 55}))
 
 
 # CALCULATION OF THE PROBABILITY
@@ -310,15 +310,16 @@ data = VariableElimination(bNet)  # inference
 
 # Potential non-smoker subject
 notSmoker = data.query(variables=['smoking'],
-                       evidence={'Gtp': 31, 'triglyceride': 113, 'LDL': 116, 'systolic': 102, 'relaxation': 71,
+                       evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 113, 'LDL': 116, 'systolic': 102, 'relaxation': 71,
                                  'HDL': 103, 'hemoglobin': 13, 'serum creatinine': 2, 'tartar': 0})
 
 prGreen('\nProbability for a potentially non-smoker:')
 print(notSmoker, '\n')
 
+
 # Test on Potentially non-smoker subject
 TestNotSmoker = data.query(variables=['smoking'],
-                           evidence={'Gtp': 53, 'triglyceride': 148, 'LDL': 116, 'systolic': 102, 'relaxation': 71,
+                           evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 53, 'triglyceride': 148, 'LDL': 116, 'systolic': 102, 'relaxation': 71,
                                      'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'tartar': 1})
 
 prGreen('\nTest on Potentially non-smoker subject:')
@@ -326,7 +327,7 @@ print(TestNotSmoker, '\n')
 
 # Potential smoker
 smoker = data.query(variables=['smoking'],
-                    evidence={'Gtp': 55, 'triglyceride': 151, 'LDL': 113, 'systolic': 93, 'relaxation': 43, 'HDL': 50,
+                    evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 151, 'LDL': 113, 'systolic': 93, 'relaxation': 43, 'HDL': 50,
                               'hemoglobin': 18, 'serum creatinine': 5, 'tartar': 1})
 
 prRed('\nProbability for a potential smoker:')
@@ -334,7 +335,7 @@ print(smoker)
 
 # Test on subject potentially smoker
 TestSmoker = data.query(variables=['smoking'],
-                        evidence={'Gtp': 32, 'triglyceride': 111, 'LDL': 113, 'systolic': 93, 'relaxation': 43,
+                        evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 32, 'triglyceride': 111, 'LDL': 113, 'systolic': 93, 'relaxation': 43,
                                   'HDL': 50, 'hemoglobin': 13, 'serum creatinine': 5, 'tartar': 0})
 
 prRed('\nTest on Subject potentially smoker:')
@@ -350,8 +351,8 @@ while True:
             exit(1)
         elif 'Y' == result or result == 'y':
             prYellow("Please insert: ")
-            columns = ["Gtp", "triglyceride", "LDL", "systolic", "relaxation", "HDL", "hemoglobin", "serum creatinine",
-                       "tartar"]
+            columns = ["age", "height(cm)", "weight(kg)", "Gtp", "triglyceride", "LDL", "systolic", "relaxation", "HDL",
+                       "hemoglobin", "serum creatinine", "tartar"]
             print(columns)
             value = [None] * len(columns)
             while i < len(columns):
@@ -368,14 +369,18 @@ while True:
                     i = i + 1
             try:
                 UserInput = data.query(variables=['smoking'],
-                                       evidence={'Gtp': value[0], 'triglyceride': value[1], 'LDL': value[2],
-                                                 'systolic': value[3], 'relaxation': value[4], 'HDL': value[5],
-                                                 'hemoglobin': value[6], 'serum creatinine': value[7], 'tartar': value[8]})
+                                       evidence={'age': value[0], 'height(cm)': value[1], 'weight(kg)': value[2],
+                                                 'Gtp': value[3], 'triglyceride': value[4], 'LDL': value[5],
+                                                 'systolic': value[6], 'relaxation': value[7], 'HDL': value[8],
+                                                 'hemoglobin': value[9], 'serum creatinine': value[10],
+                                                 'tartar': value[11]})
                 print(UserInput)
             except IndexError as e:
                 prRed("Error!")
+                print("You are insert:  ", value)
                 print(e.args)
         else:
-            print("Wrong input")
+            print("Wrong input. Write Y or N")
     except ValueError:
         print("Wrong input")
+
