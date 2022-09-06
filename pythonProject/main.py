@@ -387,15 +387,16 @@ while True:
                         if 'Y' == result or result == 'y':
                             newValue = bNet.simulate(show_progress=False, n_samples=1, evidence={"smoking": 0, 'age': value[0], 'height(cm)': value[1],
                                                                  'weight(kg)': value[2]})
-                            newValue = newValue.drop(["Cholesterol", "smoking"], axis=1)
-                            prYellow("Suggested values:")
-                            print(newValue)
+                            newValue = newValue.drop(["Cholesterol"], axis=1)
                             UserInputUpdated = data.query(show_progress=False, variables=['smoking'],
                                        evidence={'age': newValue.get("age")[0], 'height(cm)': newValue.get("height(cm)")[0], 'weight(kg)': newValue.get("weight(kg)")[0],
                                                  'Gtp': newValue.get("Gtp")[0], 'triglyceride': newValue.get("triglyceride")[0], 'LDL': newValue.get("LDL")[0],
                                                  'systolic': newValue.get("systolic")[0], 'relaxation': newValue.get("relaxation")[0], 'HDL': newValue.get("HDL")[0],
                                                  'hemoglobin': newValue.get("hemoglobin")[0], 'serum creatinine': newValue.get("serum creatinine")[0],
                                                  'tartar': newValue.get("tartar")[0]})
+                            newValue = newValue.drop(["smoking"], axis=1)
+                            prYellow("Suggested values:")
+                            print(newValue)
                             prYellow("New probability based on suggested values")
                             print(UserInputUpdated)
                     except ValueError:
