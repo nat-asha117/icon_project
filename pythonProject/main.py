@@ -49,7 +49,6 @@ def prYellow(prt):
     print("\033[93m{}\033[00m".format(prt))
 
 
-
 def autopct(pct):
     return ('%.2f' % pct + "%") if pct > 1 else ''  # shows only values of labers that are greater than 1%
 
@@ -72,7 +71,7 @@ df_smoke["tartar"] = df_smoke["tartar"].replace("Y", 1)
 
 # Data overview
 print("\nDisplay (partial) of the dataframe:\n", df_smoke.head())
-print("\nNumber of elements: ", len(df_smoke.index)-1)
+print("\nNumber of elements: ", len(df_smoke.index) - 1)
 print("\nInfo dataset:\n", df_smoke.describe())
 # Input dataset, eliminating the last column (needed for the output)
 X = df_smoke.drop("smoking", axis=1)
@@ -113,7 +112,7 @@ ax.axes.get_yaxis().set_visible(False)
 plt.title("Graph of occurrence of smokers and non-smokers\n\nafter Oversampling")
 plt.legend(labels=labels, loc="best")
 plt.show()
-"""
+
 # EVALUATION SELECTION: K-FOLD CROSS VALIDATION
 
 # Creation of X feature and target y
@@ -273,7 +272,7 @@ ax = (pd.Series(rfc_model.feature_importances_, index=X.columns)
 plt.title("Top features derived by Random Forest")
 plt.ylabel("")
 plt.show()
-"""
+
 # CREATION OF THE BAYESIAN NETWORK
 
 prYellow("\n\t\tCreation of the Bayesian Network\n")
@@ -308,39 +307,40 @@ print(bNet.get_markov_blanket('smoking'), "\n")
 # Elimination of irrelevant variables
 data = VariableElimination(bNet)  # inference
 
-
 # Potential non-smoker subject
 prGreen("Tests carried out on an average person with values:")
 print("age: 20\t-\theight(cm): 170\t-\tweight(kg): 60\n")
-notSmoker = data.query(variables=['smoking'],
-                       evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 113, 'LDL': 116, 'systolic': 102, 'relaxation': 71,
+notSmoker = data.query(show_progress=False, variables=['smoking'],
+                       evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 113,
+                                 'LDL': 116, 'systolic': 102, 'relaxation': 71,
                                  'HDL': 103, 'hemoglobin': 13, 'serum creatinine': 2, 'tartar': 0})
 
 prGreen('\nProbability for a potentially non-smoker:')
 print(notSmoker, '\n')
 
-
-
 # Test on Potentially non-smoker subject
-TestNotSmoker = data.query(variables=['smoking'],
-                           evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 53, 'triglyceride': 148, 'LDL': 116, 'systolic': 102, 'relaxation': 71,
+TestNotSmoker = data.query(show_progress=False, variables=['smoking'],
+                           evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 53, 'triglyceride': 148,
+                                     'LDL': 116, 'systolic': 102, 'relaxation': 71,
                                      'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'tartar': 1})
 
 prGreen('\nTest on Potentially non-smoker subject:')
 print(TestNotSmoker, '\n')
 
 # Potential smoker
-smoker = data.query(variables=['smoking'],
-                    evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 151, 'LDL': 113, 'systolic': 93, 'relaxation': 43, 'HDL': 50,
+smoker = data.query(show_progress=False, variables=['smoking'],
+                    evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 151,
+                              'LDL': 113, 'systolic': 93, 'relaxation': 43, 'HDL': 50,
                               'hemoglobin': 18, 'serum creatinine': 5, 'tartar': 1})
 
 prRed('\nProbability for a potential smoker:')
 print(smoker)
 
 # Test on subject potentially smoker
-TestSmoker = data.query(variables=['smoking'],
-                        evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 32, 'triglyceride': 130, 'LDL': 113, 'systolic': 93, 'relaxation': 43,
-                                  'HDL': 50, 'hemoglobin': 13, 'serum creatinine': 5, 'tartar': 0})
+TestSmoker = data.query(show_progress=False, variables=['smoking'],
+                        evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 18, 'triglyceride': 151,
+                                  'LDL': 113, 'systolic': 130, 'relaxation': 43,
+                                  'HDL': 50, 'hemoglobin': 13, 'serum creatinine': 0, 'tartar': 1})
 
 prRed('\nTest on Subject potentially smoker:')
 print(TestSmoker, '\n')
@@ -372,7 +372,7 @@ while True:
                 else:
                     i = i + 1
             try:
-                UserInput = data.query(variables=['smoking'],
+                UserInput = data.query(show_progress=False, variables=['smoking'],
                                        evidence={'age': value[0], 'height(cm)': value[1], 'weight(kg)': value[2],
                                                  'Gtp': value[3], 'triglyceride': value[4], 'LDL': value[5],
                                                  'systolic': value[6], 'relaxation': value[7], 'HDL': value[8],
@@ -385,20 +385,32 @@ while True:
                                  " - Y/N")
                         result = str(input())
                         if 'Y' == result or result == 'y':
-                            newValue = bNet.simulate(show_progress=False, n_samples=1, evidence={"smoking": 0, 'age': value[0], 'height(cm)': value[1],
-                                                                 'weight(kg)': value[2]})
-                            newValue = newValue.drop(["Cholesterol"], axis=1)
-                            UserInputUpdated = data.query(show_progress=False, variables=['smoking'],
-                                       evidence={'age': newValue.get("age")[0], 'height(cm)': newValue.get("height(cm)")[0], 'weight(kg)': newValue.get("weight(kg)")[0],
-                                                 'Gtp': newValue.get("Gtp")[0], 'triglyceride': newValue.get("triglyceride")[0], 'LDL': newValue.get("LDL")[0],
-                                                 'systolic': newValue.get("systolic")[0], 'relaxation': newValue.get("relaxation")[0], 'HDL': newValue.get("HDL")[0],
-                                                 'hemoglobin': newValue.get("hemoglobin")[0], 'serum creatinine': newValue.get("serum creatinine")[0],
-                                                 'tartar': newValue.get("tartar")[0]})
-                            newValue = newValue.drop(["smoking"], axis=1)
-                            prYellow("Suggested values:")
-                            print(newValue)
-                            prYellow("New probability based on suggested values")
-                            print(UserInputUpdated)
+                            check = False
+                            while not check:
+                                newValue = bNet.simulate(show_progress=False, n_samples=1,
+                                                         evidence={"smoking": 0, 'age': value[0], 'height(cm)': value[1],
+                                                                   'weight(kg)': value[2]})
+                                newValue = newValue.drop(["Cholesterol", "smoking"], axis=1)
+                                UserInputUpdated = data.query(show_progress=False, variables=['smoking'],
+                                                              evidence={'age': newValue.get("age")[0],
+                                                                        'height(cm)': newValue.get("height(cm)")[0],
+                                                                        'weight(kg)': newValue.get("weight(kg)")[0],
+                                                                        'Gtp': newValue.get("Gtp")[0],
+                                                                        'triglyceride': newValue.get("triglyceride")[0],
+                                                                        'LDL': newValue.get("LDL")[0],
+                                                                        'systolic': newValue.get("systolic")[0],
+                                                                        'relaxation': newValue.get("relaxation")[0],
+                                                                        'HDL': newValue.get("HDL")[0],
+                                                                        'hemoglobin': newValue.get("hemoglobin")[0],
+                                                                        'serum creatinine':
+                                                                            newValue.get("serum creatinine")[0],
+                                                                        'tartar': newValue.get("tartar")[0]})
+                                if UserInputUpdated.values[0] > 0.50:
+                                    prYellow("Suggested values:")
+                                    print(newValue)
+                                    prYellow("New probability based on suggested values")
+                                    print(UserInputUpdated)
+                                    check = True
                     except ValueError:
                         print("Wrong input")
             except IndexError as e:
@@ -409,4 +421,3 @@ while True:
             print("Wrong input. Write Y or N")
     except ValueError:
         print("Wrong input")
-
