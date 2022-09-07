@@ -5,6 +5,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import networkx as nx
 
 # Classification models
 from pgmpy.estimators import K2Score, HillClimbSearch, MaximumLikelihoodEstimator
@@ -247,10 +248,42 @@ for train_index, test_index in kf.split(X, y):
 
         return df_smoke_models
 
-# Visualization of the table with metrics
+# Visualization of the table with metrics and Graph
 df_smoke_models_concat = pd.concat(model_report(model), axis=0).reset_index()  # concatenation of the models
 df_smoke_models_concat = df_smoke_models_concat.drop('index', axis=1)  # removal of the index
 print("\n", df_smoke_models_concat)  # table display
+
+# Accuracy Graph
+x = df_smoke_models_concat.model
+y = df_smoke_models_concat.accuracy
+
+plt.plot(x, y, marker='x')
+plt.title("Accuracy")
+plt.show()
+
+# Precision Graph
+x = df_smoke_models_concat.model
+y = df_smoke_models_concat.precision
+
+plt.plot(x, y, linestyle='None', marker='x')
+plt.title("Precision")
+plt.show()
+
+# Recall Graph
+x = df_smoke_models_concat.model
+y = df_smoke_models_concat.recall
+
+plt.plot(x, y, linestyle='none', marker='x')
+plt.title("Recall")
+plt.show()
+
+# F1score Graph
+x = df_smoke_models_concat.model
+y = df_smoke_models_concat.f1score
+
+plt.plot(x, y, linestyle='none', marker='x')
+plt.title("F1score")
+plt.show()
 
 # VERIFICATION OF THE IMPORTANCE OF FEATURES
 
@@ -300,7 +333,30 @@ prYellow("\nMarkov blanket for \"smoking\"")
 print(bNet.get_markov_blanket('smoking'), "\n")
 # print(MaximumLikelihoodEstimator(bNet, df_smoke).estimate_cpd('Gtp'))
 
-
+# Graph of nodes
+G = nx.Graph()
+G.add_edges_from(k2_model.edges())
+pos = nx.spring_layout(G)
+val_map = {'smoking': 1.0}
+values = [val_map.get(node, 0.25) for node in G.nodes()]
+red_edges = [('smoking', 'HDL')]
+edge_colours = ['black' if not edge in red_edges else 'red'
+                for edge in G.edges()]
+black_edges = [edge for edge in G.edges() if edge not in red_edges]
+pos = nx.spring_layout(G)
+nx.draw_networkx_nodes(G, pos, cmap=plt.get_cmap('jet'),
+                       node_color=values, node_size=500)
+nx.draw_networkx_labels(G, pos)
+nx.draw_networkx_edges(G, pos, edgelist=red_edges, edge_color='r', arrows=True)
+nx.draw_networkx_edges(G, pos, edgelist=black_edges, arrows=False)
+plt.title("BAYESIAN NETWORK GRAPH")
+plt.show()
+"""
+prYellow("Local independencies for \"smoking\":")
+print(bNet.local_independencies('smoking'))
+prYellow("All independencies:")
+print(bNet.get_independencies())
+"""
 # CALCULATION OF THE PROBABILITY
 # Probability calculation for a supposedly non-smoker (0) and a smoker (1)
 
@@ -397,7 +453,8 @@ while True:
                             check = False
                             while not check:
                                 newValue = bNet.simulate(show_progress=False, n_samples=1,
-                                                         evidence={"smoking": 0, 'age': value[0], 'height(cm)': value[1],
+                                                         evidence={"smoking": 0, 'age': value[0],
+                                                                   'height(cm)': value[1],
                                                                    'weight(kg)': value[2]})
                                 newValue = newValue.drop(["Cholesterol", "smoking"], axis=1)
                                 UserInputUpdated = data.query(show_progress=False, variables=['smoking'],
