@@ -265,7 +265,7 @@ plt.show()
 x = df_smoke_models_concat.model
 y = df_smoke_models_concat.precision
 
-plt.plot(x, y, linestyle='None', marker='x')
+plt.bar(x, y)
 plt.title("Precision")
 plt.show()
 
@@ -273,7 +273,7 @@ plt.show()
 x = df_smoke_models_concat.model
 y = df_smoke_models_concat.recall
 
-plt.plot(x, y, linestyle='none', marker='x')
+plt.barh(x, y, color="purple")
 plt.title("Recall")
 plt.show()
 
@@ -281,7 +281,7 @@ plt.show()
 x = df_smoke_models_concat.model
 y = df_smoke_models_concat.f1score
 
-plt.plot(x, y, linestyle='none', marker='x')
+plt.plot(x, y, marker='X')
 plt.title("F1score")
 plt.show()
 
@@ -414,6 +414,7 @@ while True:
             columns = ["age", "height(cm)", "weight(kg)", "Gtp", "triglyceride", "LDL", "systolic", "relaxation", "HDL",
                        "hemoglobin", "serum creatinine", "tartar"]
             print(columns)
+            prRed("Age - height(cm) - weight(kg) are obligatory to enter!")
             # columns.remove("age", "height(cm)", "weight(kg)")
             # print(columns)
 
