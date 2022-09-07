@@ -334,29 +334,25 @@ print(bNet.get_markov_blanket('smoking'), "\n")
 # print(MaximumLikelihoodEstimator(bNet, df_smoke).estimate_cpd('Gtp'))
 
 # Graph of nodes
-G = nx.Graph()
+
+G = nx.OrderedMultiDiGraph()
 G.add_edges_from(k2_model.edges())
-pos = nx.spring_layout(G)
-val_map = {'smoking': 1.0}
-values = [val_map.get(node, 0.25) for node in G.nodes()]
-red_edges = [('smoking', 'HDL')]
-edge_colours = ['black' if not edge in red_edges else 'red'
-                for edge in G.edges()]
-black_edges = [edge for edge in G.edges() if edge not in red_edges]
-pos = nx.spring_layout(G)
+pos = nx.spring_layout(G, iterations=20)
 nx.draw_networkx_nodes(G, pos, cmap=plt.get_cmap('jet'),
-                       node_color=values, node_size=500)
-nx.draw_networkx_labels(G, pos)
-nx.draw_networkx_edges(G, pos, edgelist=red_edges, edge_color='r', arrows=True)
-nx.draw_networkx_edges(G, pos, edgelist=black_edges, arrows=False)
+                       node_size=175)
+nx.draw_networkx_labels(G, pos, font_size=8, clip_on=True, horizontalalignment="center", verticalalignment="baseline")
+nx.draw_networkx_edges(G, pos, arrows=True, edge_color="r")
 plt.title("BAYESIAN NETWORK GRAPH")
 plt.show()
+
 """
+# Independencies
 prYellow("Local independencies for \"smoking\":")
 print(bNet.local_independencies('smoking'))
 prYellow("All independencies:")
 print(bNet.get_independencies())
 """
+
 # CALCULATION OF THE PROBABILITY
 # Probability calculation for a supposedly non-smoker (0) and a smoker (1)
 
