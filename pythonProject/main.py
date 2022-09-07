@@ -358,26 +358,35 @@ while True:
             columns = ["age", "height(cm)", "weight(kg)", "Gtp", "triglyceride", "LDL", "systolic", "relaxation", "HDL",
                        "hemoglobin", "serum creatinine", "tartar"]
             print(columns)
+            # columns.remove("age", "height(cm)", "weight(kg)")
+            # print(columns)
+
             value = [None] * len(columns)
             while i < len(columns):
-                if columns[i] != "tartar":
+                if columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)":
                     print("Insert ", columns[i], " value: ")
+                elif columns[i] != "tartar":
+                    print("Insert ", columns[i], " value (if you don’t have the value, enter -1): ")
                 else:
-                    print("Insert ", columns[i], " value (0 = No, 1 = Yes): ")
+                    print("Insert ", columns[i], " value (0 = No, 1 = Yes, -1 = Data not available): ")
                 value[i] = int(input())
-                if value[i] <= -1:
+                if value[i] == -1 and (columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)"):
+                    prRed("Insert value >= 0")
+                elif value[i] <= -2:
                     prRed("Insert value >= 0")
                 elif (columns[i] == "tartar") and (value[i] > 1):
                     prRed("Error! Insert value (0 = No, 1 = Yes): ")
                 else:
                     i = i + 1
             try:
+                i = 0
+                dataAvailable = {}
+                while i < len(columns):
+                    if value[i] != -1:
+                        dataAvailable[columns[i]] = value[i]
+                    i = i + 1
                 UserInput = data.query(show_progress=False, variables=['smoking'],
-                                       evidence={'age': value[0], 'height(cm)': value[1], 'weight(kg)': value[2],
-                                                 'Gtp': value[3], 'triglyceride': value[4], 'LDL': value[5],
-                                                 'systolic': value[6], 'relaxation': value[7], 'HDL': value[8],
-                                                 'hemoglobin': value[9], 'serum creatinine': value[10],
-                                                 'tartar': value[11]})
+                                       evidence=dataAvailable)
                 print(UserInput)
                 if UserInput.values[0] <= 0.50:
                     try:
