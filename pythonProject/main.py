@@ -335,7 +335,7 @@ print(bNet.get_markov_blanket('smoking'), "\n")
 
 # Graph of nodes
 
-G = nx.OrderedMultiDiGraph()
+G = nx.MultiDiGraph()
 G.add_edges_from(k2_model.edges())
 pos = nx.spring_layout(G, iterations=20)
 nx.draw_networkx_nodes(G, pos, cmap=plt.get_cmap('jet'),
