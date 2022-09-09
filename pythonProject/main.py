@@ -55,7 +55,7 @@ def autopct(pct):
 
 
 # Import of the dataset
-df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
+df = pd.read_csv("C:\\Users\\natax\\icon_project\\pythonProject\\smoking.csv")
 
 prYellow("\n\n\t\t\t\t\t\t\t\tWelcome to our system!\n\n\t"
          "It allows you to predict whether, taken of the subjects, they are smokers or not.\n\n")
@@ -413,7 +413,7 @@ while True:
             value = [None] * len(columns)
             while i < len(columns):
                 if columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)":
-                    print("The range of values goes in 5 in 5 (Example 20 - 25 - 30)")
+                    print("The range of allowed values are multiples of 5")
                     print("The minimum acceptable", columns[i], "value is:", df_smoke[columns[i]].min(), "The maximum is:", df_smoke[columns[i]].max())
                     print("Insert ", columns[i], " value: ")
                 elif columns[i] != "tartar":
