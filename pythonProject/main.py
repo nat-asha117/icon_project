@@ -413,20 +413,35 @@ while True:
             value = [None] * len(columns)
             while i < len(columns):
                 if columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)":
-                    print("Insert ", columns[i], " value: ")
+                    print("The range of values goes in 5 in 5 (Example 20 - 25 - 30)")
+                    if columns[i] == "age":
+                        print("The minimum acceptable", columns[i], "value is:", df_smoke[columns[i]].min(), ". The maximum is:", df_smoke[columns[i]].max())
+                        print("Insert ", columns[i], " value: ")
                 elif columns[i] != "tartar":
                     print("Insert ", columns[i], " value (if you don’t have the value, enter -1): ")
                 else:
                     print("Insert ", columns[i], " value (0 = No, 1 = Yes, -1 = Data not available): ")
                 value[i] = int(input())
-                if value[i] == -1 and (columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)"):
-                    prRed("Insert value >= 0")
-                elif value[i] <= -2:
-                    prRed("Insert value >= 0")
-                elif (columns[i] == "tartar") and (value[i] > 1):
-                    prRed("Error! Insert value (0 = No, 1 = Yes): ")
+                if columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)":
+                    if value[i] <= 0:
+                        prRed("Insert value >= 0")
+                    elif value[i] < df_smoke[columns[i]].min():
+                        prRed("Error! You entered too small value!")
+                    elif value[i] > df_smoke[columns[i]].max():
+                        prRed("Error! You entered too large value!")
+                    elif value[i] % 5 != 0:
+                        prRed("Error! You have not entered a multiple of 5")
+                    else:
+                        i = i + 1
                 else:
-                    i = i + 1
+                    if value[i] == -1 and ():
+                        prRed("Insert value >= 0")
+                    elif value[i] <= -2:
+                        prRed("Insert value >= 0")
+                    elif (columns[i] == "tartar") and (value[i] > 1):
+                        prRed("Error! Insert value (0 = No, 1 = Yes): ")
+                    else:
+                        i = i + 1
             try:
                 i = 0
                 dataAvailable = {}
