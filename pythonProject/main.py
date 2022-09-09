@@ -257,7 +257,7 @@ print("\n", df_smoke_models_concat)  # table display
 x = df_smoke_models_concat.model
 y = df_smoke_models_concat.accuracy
 
-plt.plot(x, y, marker='x')
+plt.bar(x, y)
 plt.title("Accuracy")
 plt.show()
 
@@ -273,7 +273,7 @@ plt.show()
 x = df_smoke_models_concat.model
 y = df_smoke_models_concat.recall
 
-plt.barh(x, y, color="purple")
+plt.bar(x, y)
 plt.title("Recall")
 plt.show()
 
@@ -281,7 +281,7 @@ plt.show()
 x = df_smoke_models_concat.model
 y = df_smoke_models_concat.f1score
 
-plt.plot(x, y, marker='X')
+plt.bar(x, y)
 plt.title("F1score")
 plt.show()
 
