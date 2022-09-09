@@ -414,9 +414,8 @@ while True:
             while i < len(columns):
                 if columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)":
                     print("The range of values goes in 5 in 5 (Example 20 - 25 - 30)")
-                    if columns[i] == "age":
-                        print("The minimum acceptable", columns[i], "value is:", df_smoke[columns[i]].min(), ". The maximum is:", df_smoke[columns[i]].max())
-                        print("Insert ", columns[i], " value: ")
+                    print("The minimum acceptable", columns[i], "value is:", df_smoke[columns[i]].min(), "The maximum is:", df_smoke[columns[i]].max())
+                    print("Insert ", columns[i], " value: ")
                 elif columns[i] != "tartar":
                     print("Insert ", columns[i], " value (if you don’t have the value, enter -1): ")
                 else:
