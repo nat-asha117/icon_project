@@ -364,7 +364,6 @@ prGreen("Tests carried out on an average person with values:")
 print("age: 20\t-\theight(cm): 170\t-\tweight(kg): 60\n")
 notSmoker = data.query(show_progress=False, variables=['smoking'],
                        evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 113,
-                                 'LDL': 116, 'systolic': 102, 'relaxation': 71,
                                  'HDL': 103, 'hemoglobin': 13, 'serum creatinine': 2, 'tartar': 0})
 
 prGreen('\nProbability for a potentially non-smoker:')
@@ -373,7 +372,6 @@ print(notSmoker, '\n')
 # Test on Potentially non-smoker subject
 TestNotSmoker = data.query(show_progress=False, variables=['smoking'],
                            evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 53, 'triglyceride': 148,
-                                     'LDL': 116, 'systolic': 102, 'relaxation': 71,
                                      'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'tartar': 1})
 
 prGreen('\nTest on Potentially non-smoker subject:')
@@ -381,8 +379,7 @@ print(TestNotSmoker, '\n')
 
 # Potential smoker
 smoker = data.query(show_progress=False, variables=['smoking'],
-                    evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 151,
-                              'LDL': 113, 'systolic': 93, 'relaxation': 43, 'HDL': 50,
+                    evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 151, 'HDL': 50,
                               'hemoglobin': 18, 'serum creatinine': 5, 'tartar': 1})
 
 prRed('\nProbability for a potential smoker:')
@@ -391,7 +388,6 @@ print(smoker)
 # Test on subject potentially smoker
 TestSmoker = data.query(show_progress=False, variables=['smoking'],
                         evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 18, 'triglyceride': 151,
-                                  'LDL': 113, 'systolic': 130, 'relaxation': 43,
                                   'HDL': 50, 'hemoglobin': 13, 'serum creatinine': 0, 'tartar': 1})
 
 prRed('\nTest on Subject potentially smoker:')
@@ -407,7 +403,7 @@ while True:
             exit(1)
         elif 'Y' == result or result == 'y':
             prYellow("Please insert: ")
-            columns = ["age", "height(cm)", "weight(kg)", "Gtp", "triglyceride", "LDL", "systolic", "relaxation", "HDL",
+            columns = ["age", "height(cm)", "weight(kg)", "Gtp", "triglyceride", "HDL",
                        "hemoglobin", "serum creatinine", "tartar"]
             print(columns)
             prRed("Age - height(cm) - weight(kg) are obligatory to enter!")
@@ -460,9 +456,6 @@ while True:
                                                                         'weight(kg)': newValue.get("weight(kg)")[0],
                                                                         'Gtp': newValue.get("Gtp")[0],
                                                                         'triglyceride': newValue.get("triglyceride")[0],
-                                                                        'LDL': newValue.get("LDL")[0],
-                                                                        'systolic': newValue.get("systolic")[0],
-                                                                        'relaxation': newValue.get("relaxation")[0],
                                                                         'HDL': newValue.get("HDL")[0],
                                                                         'hemoglobin': newValue.get("hemoglobin")[0],
                                                                         'serum creatinine':
