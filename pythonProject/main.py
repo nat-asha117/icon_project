@@ -27,10 +27,13 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.utils import resample
+import warnings
+
 
 
 # Support methods
 def simulationThread(bNet, value, data, evemt):
+    warnings.filterwarnings("ignore")
     prGreen("Finding combination...")
     time.sleep(1)
     while True:
@@ -66,6 +69,10 @@ def prPurple(prt):
 
 def prRedMoreString(prt, prt2, prt3):
     print("\033[91m{}\033[00m".format(prt), prt2, prt3)
+
+
+def prYellowMoreString(prt, prt2, prt3):
+    print("\033[91m{}\033[00m".format(prt),"\033[91m{}\033[00m".format(prt2),"\033[91m{}\033[00m".format(prt3))
 
 
 def prGreenMoreString(prt, prt2, prt3):
@@ -445,14 +452,11 @@ if __name__ == '__main__':
                            "hemoglobin", "serum creatinine", "tartar"]
                 print(columns)
                 prRed("Age - height(cm) - weight(kg) are obligatory to enter!")
-                # columns.remove("age", "height(cm)", "weight(kg)")
-                # print(columns)
-
                 value = [None] * len(columns)
                 while i < len(columns):
                     if columns[i] == "age" or columns[i] == "height(cm)" or columns[i] == "weight(kg)":
-                        print("The range of allowed values are multiples of 5")
-                        print("The minimum acceptable", columns[i], "value is:", df_smoke[columns[i]].min(),
+                        prRed("The range of allowed values are multiples of 5")
+                        print("The minimum acceptable \"", columns[i], "\"value is:", df_smoke[columns[i]].min(),
                               "The maximum is:", df_smoke[columns[i]].max())
                         print("Insert ", columns[i], " value: ")
                     elif columns[i] != "tartar":
@@ -495,12 +499,14 @@ if __name__ == '__main__':
                                  " - Y/N")
                         result = str(input())
                         if 'Y' == result or result == 'y':
-
-                            prYellow("The search will last 1 minute. If no ideal combinations are found, no data will be displayed.")
+                            waitTime = float(60)
+                            prYellowMoreString("The search will last", waitTime, "seconds. If no ideal combinations "
+                                                                                 "are found, no data will be "
+                                                                                 "displayed.")
                             event = multiprocessing.Event()
                             t = multiprocessing.Process(target=simulationThread, args=(bNet, value, data, event))
                             t.start()
-                            if not event.wait(60):
+                            if not event.wait(waitTime):
                                 prRed("Error! No data find.")
                             event.clear()
                             t.terminate()
