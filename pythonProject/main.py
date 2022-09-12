@@ -18,7 +18,7 @@ from pgmpy.models import BayesianNetwork
 
 # Machine learning
 from sklearn import metrics
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import RepeatedKFold
 
 # Classification algorithms
 from sklearn.ensemble import RandomForestClassifier
@@ -50,8 +50,8 @@ def simulationThread(bNet, value, data, evemt):
                                                 'triglyceride': newValue.get("triglyceride")[0],
                                                 'HDL': newValue.get("HDL")[0],
                                                 'hemoglobin': newValue.get("hemoglobin")[0],
-                                                'serum creatinine':
-                                                    newValue.get("serum creatinine")[0],
+                                                'serum creatinine': newValue.get("serum creatinine")[0],
+                                                "dental caries": newValue.get("dental caries")[0],
                                                 'tartar': newValue.get("tartar")[0]})
         if UserInputUpdated.values[0] > 0.50:
             time.sleep(1)
@@ -165,7 +165,7 @@ if __name__ == '__main__':
     X = df_smoke.to_numpy()
     y = df_smoke["smoking"].to_numpy()  # K-Fold Cross Validation
 
-    kf = StratifiedKFold(n_splits=5)  # used because the class is unbalanced
+    kf = RepeatedKFold(n_splits=5, n_repeats=5)
 
     # Classifiers for the purpose of evaluation
     knn = KNeighborsClassifier()
@@ -409,7 +409,7 @@ if __name__ == '__main__':
     print("age: 20\t-\theight(cm): 170\t-\tweight(kg): 60\n")
     notSmoker = data.query(show_progress=False, variables=['smoking'],
                            evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 113,
-                                     'HDL': 103, 'hemoglobin': 13, 'serum creatinine': 2, 'tartar': 0})
+                                     'HDL': 103, 'hemoglobin': 13, 'serum creatinine': 2, 'dental caries': 0, 'tartar': 0})
 
     prGreen('\nProbability for a potentially non-smoker:')
     print(notSmoker, '\n')
@@ -417,7 +417,7 @@ if __name__ == '__main__':
     # Test on Potentially non-smoker subject
     TestNotSmoker = data.query(show_progress=False, variables=['smoking'],
                                evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 53, 'triglyceride': 148,
-                                         'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'tartar': 1})
+                                         'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'dental caries': 0, 'tartar': 1})
 
     prGreen('\nTest on Potentially non-smoker subject:')
     print(TestNotSmoker, '\n')
@@ -425,7 +425,7 @@ if __name__ == '__main__':
     # Potential smoker
     smoker = data.query(show_progress=False, variables=['smoking'],
                         evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 151, 'HDL': 50,
-                                  'hemoglobin': 18, 'serum creatinine': 5, 'tartar': 1})
+                                  'hemoglobin': 18, 'serum creatinine': 5,'dental caries': 1, 'tartar': 1})
 
     prRed('\nProbability for a potential smoker:')
     print(smoker)
@@ -433,7 +433,7 @@ if __name__ == '__main__':
     # Test on subject potentially smoker
     TestSmoker = data.query(show_progress=False, variables=['smoking'],
                             evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 18, 'triglyceride': 151,
-                                      'HDL': 50, 'hemoglobin': 13, 'serum creatinine': 0, 'tartar': 1})
+                                      'HDL': 50, 'hemoglobin': 13, 'serum creatinine': 0, 'dental caries': 1, 'tartar': 1})
 
     prRed('\nTest on Subject potentially smoker:')
     print(TestSmoker, '\n')
@@ -449,7 +449,7 @@ if __name__ == '__main__':
             elif 'Y' == result or result == 'y':
                 prYellow("Please insert: ")
                 columns = ["age", "height(cm)", "weight(kg)", "Gtp", "triglyceride", "HDL",
-                           "hemoglobin", "serum creatinine", "tartar"]
+                           "hemoglobin", "serum creatinine", "dental caries","tartar"]
                 print(columns)
                 prRed("Age - height(cm) - weight(kg) are obligatory to enter!")
                 value = [None] * len(columns)
@@ -459,7 +459,7 @@ if __name__ == '__main__':
                         print("The minimum acceptable \"", columns[i], "\"value is:", df_smoke[columns[i]].min(),
                               "The maximum is:", df_smoke[columns[i]].max())
                         print("Insert ", columns[i], " value: ")
-                    elif columns[i] != "tartar":
+                    elif columns[i] != "tartar" and columns[i] != "dental caries":
                         print("Insert ", columns[i], " value (if you don’t have the value, enter -1): ")
                     else:
                         print("Insert ", columns[i], " value (0 = No, 1 = Yes, -1 = Data not available): ")
@@ -481,6 +481,8 @@ if __name__ == '__main__':
                         elif value[i] <= -2:
                             prRed("Insert value >= 0")
                         elif (columns[i] == "tartar") and (value[i] > 1):
+                            prRed("Error! Insert value (0 = No, 1 = Yes): ")
+                        elif (columns[i] == "dental caries") and (value[i] > 1):
                             prRed("Error! Insert value (0 = No, 1 = Yes): ")
                         else:
                             i = i + 1
