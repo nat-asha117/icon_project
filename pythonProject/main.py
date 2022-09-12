@@ -404,6 +404,10 @@ if __name__ == '__main__':
     # Elimination of irrelevant variables
     data = VariableElimination(bNet)  # inference
 
+    # Display of edges and arcs
+    print('\033[1m' + '\nNodes:\n' + '\033[0m', bNet.nodes)
+    print('\033[1m' + '\nEdges:\n' + '\033[0m', bNet.edges)
+
     # Potential non-smoker subject
     prGreen("Tests carried out on an average person with values:")
     print("age: 20\t-\theight(cm): 170\t-\tweight(kg): 60\n")
@@ -417,7 +421,7 @@ if __name__ == '__main__':
     # Test on Potentially non-smoker subject
     TestNotSmoker = data.query(show_progress=False, variables=['smoking'],
                                evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 53, 'triglyceride': 148,
-                                         'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'dental caries': 0, 'tartar': 1})
+                                         'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'dental caries': 0, 'tartar': 0})
 
     prGreen('\nTest on Potentially non-smoker subject:')
     print(TestNotSmoker, '\n')
