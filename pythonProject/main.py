@@ -6,7 +6,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import networkx as nx
 import sys
 import time
 import multiprocessing
@@ -28,7 +27,6 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.utils import resample
 import warnings
-
 
 
 # Support methods
@@ -102,7 +100,7 @@ if __name__ == '__main__':
     else:
         df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
 
-    prYellow("\n\n\t\t\t\t\t\t\t\tWelcome to our system!\n\n\t"
+    prYellow("\n\n\t\t\t\t\tWelcome to our system!\n\n\t"
              "It allows you to predict whether, taken of the subjects, they are smokers or not.\n\n")
 
     # DATASET OPTIMIZATION:
@@ -275,7 +273,6 @@ if __name__ == '__main__':
         model['GaussianNB']['recall_list'] = (metrics.recall_score(y_test, y_pred_gnb))
         model['GaussianNB']['f1_list'] = (metrics.f1_score(y_test, y_pred_gnb))
 
-
         # report template
         def model_report(model):
 
@@ -376,30 +373,9 @@ if __name__ == '__main__':
 
     prYellow("\nMarkov blanket for \"smoking\"")
     print(bNet.get_markov_blanket('smoking'), "\n")
-    # print(MaximumLikelihoodEstimator(bNet, df_smoke).estimate_cpd('Gtp'))
-
-    # Graph of nodes
-
-    G = nx.MultiDiGraph()
-    G.add_edges_from(k2_model.edges())
-    pos = nx.spring_layout(G, iterations=20)
-    nx.draw_networkx_nodes(G, pos, cmap=plt.get_cmap('jet'),
-                           node_size=175)
-    nx.draw_networkx_labels(G, pos, font_size=8, clip_on=True, horizontalalignment="center", verticalalignment="baseline")
-    nx.draw_networkx_edges(G, pos, arrows=True, edge_color="r")
-    plt.title("BAYESIAN NETWORK GRAPH")
-    plt.show()
-
-    """
-    # Independencies
-    prYellow("Local independencies for \"smoking\":")
-    print(bNet.local_independencies('smoking'))
-    prYellow("All independencies:")
-    print(bNet.get_independencies())
-    """
 
     # CALCULATION OF THE PROBABILITY
-    # Probability calculation for a supposedly non-smoker (0) and a smoker (1)
+    #  calculation for a supposed non-smoker (0) and a smoker (1)
 
     # Elimination of irrelevant variables
     data = VariableElimination(bNet)  # inference
@@ -421,7 +397,7 @@ if __name__ == '__main__':
     # Test on Potentially non-smoker subject
     TestNotSmoker = data.query(show_progress=False, variables=['smoking'],
                                evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 53, 'triglyceride': 148,
-                                         'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'dental caries': 0, 'tartar': 0})
+                                         'HDL': 103, 'hemoglobin': 17, 'serum creatinine': 2, 'dental caries': 0, 'tartar': 1})
 
     prGreen('\nTest on Potentially non-smoker subject:')
     print(TestNotSmoker, '\n')
@@ -429,7 +405,7 @@ if __name__ == '__main__':
     # Potential smoker
     smoker = data.query(show_progress=False, variables=['smoking'],
                         evidence={'age': 20, 'height(cm)': 170, 'weight(kg)': 60, 'Gtp': 31, 'triglyceride': 151, 'HDL': 50,
-                                  'hemoglobin': 18, 'serum creatinine': 5,'dental caries': 1, 'tartar': 1})
+                                  'hemoglobin': 18, 'serum creatinine': 5, 'dental caries': 1, 'tartar': 1})
 
     prRed('\nProbability for a potential smoker:')
     print(smoker)
@@ -453,7 +429,7 @@ if __name__ == '__main__':
             elif 'Y' == result or result == 'y':
                 prYellow("Please insert: ")
                 columns = ["age", "height(cm)", "weight(kg)", "Gtp", "triglyceride", "HDL",
-                           "hemoglobin", "serum creatinine", "dental caries","tartar"]
+                           "hemoglobin", "serum creatinine", "dental caries", "tartar"]
                 print(columns)
                 prRed("Age - height(cm) - weight(kg) are obligatory to enter!")
                 value = [None] * len(columns)
