@@ -100,8 +100,7 @@ if __name__ == '__main__':
     else:
         df = pd.read_csv("C:\\Users\\verio\\repo\\icon_project\\pythonProject\\smoking.csv")
 
-    prYellow("\n\n\t\t\t\t\tWelcome to our system!\n\n\t"
-             "It allows you to predict whether, taken of the subjects, they are smokers or not.\n\n")
+
 
     # DATASET OPTIMIZATION:
 
@@ -417,6 +416,9 @@ if __name__ == '__main__':
 
     prRed('\nTest on Subject potentially smoker:')
     print(TestSmoker, '\n')
+
+    prYellow("\n\n\t\t\t\t\tWelcome to our system!\n\n\t"
+             "It allows you to predict whether, taken of the subjects, they are smokers or not.\n\n")
 
     #
     while True:
